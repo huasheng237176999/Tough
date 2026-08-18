@@ -1,0 +1,1141 @@
+
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>海洋能及負碳高速運算平台</title>
+<style>
+:root{
+  --rail:36px;--panel:332px;--deep:#071a28;--rail-bg:#153441;--rail-bg-2:#102b38;
+  --active:#0a9dda;--cyan:#25dce5;--panel-bg:#145d8f;--panel-bg-2:#10517f;
+  --input:#104a73;--border:#347fac;--text:#fff;--required:#ffd166;--error:#ff9b67;--success:#72e6bb;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",system-ui,sans-serif;
+  --mono:"SFMono-Regular","Cascadia Code","JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--deep);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{width:100vw;height:100vh;display:grid;grid-template-columns:calc(var(--rail) + var(--panel)) minmax(0,1fr);overflow:hidden;background:var(--deep)}
+.sidebar{height:100vh;min-height:0;display:grid;grid-template-columns:var(--rail) var(--panel);grid-template-rows:68px minmax(0,1fr);background:var(--panel-bg);border-right:1px solid #0a334f;overflow:hidden}
+.brand-head{grid-column:1/3;height:68px;display:flex;align-items:center;gap:10px;padding:8px 10px;background:linear-gradient(180deg,#0b95d4 0%,#067bc2 100%);border-bottom:1px solid rgba(37,220,229,.75)}
+.logo{width:36px;height:36px;flex:0 0 auto;display:grid;place-items:center;border:2px solid rgba(255,255,255,.92);border-radius:3px;color:#fff;font:900 10px/1 var(--font)}
+.brand-copy{min-width:0}
+.brand-copy small{display:block;color:#e5f7ff;font-size:10px;line-height:1.3;font-weight:700}
+.brand-copy strong{display:block;color:#fff;font-size:14px;line-height:1.25;font-weight:900}
+.rail{grid-column:1;grid-row:2;min-height:0;display:flex;flex-direction:column;align-items:center;padding-top:8px;background:linear-gradient(180deg,var(--rail-bg),var(--rail-bg-2));border-right:1px solid rgba(0,0,0,.35)}
+.rail button{position:relative;width:36px;height:36px;display:grid;place-items:center;border:0;background:transparent;color:rgba(229,244,250,.78);padding:0;transition:background .14s,color .14s}
+.rail button:hover{background:rgba(10,157,218,.22);color:#fff}
+.rail button.active{background:#0784cf;color:#fff}
+.rail button.active:before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--cyan)}
+.rail svg{width:20px;height:20px;stroke-width:1.9}
+.rail .bottom{margin-top:auto;margin-bottom:8px}
+.panel{grid-column:2;grid-row:2;height:100%;min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,var(--panel-bg),var(--panel-bg-2))}
+.func-head{flex:0 0 48px;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:linear-gradient(180deg,#0a91d2,#087dc2);border-bottom:1px solid rgba(207,246,255,.75)}
+.func-title{display:flex;align-items:center;gap:8px;font-size:19px;line-height:1;font-weight:900;min-width:0}
+.func-icon{width:18px;height:18px;color:#fff;flex:0 0 18px}
+.close-dot{width:27px;height:27px;flex:0 0 27px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.9);border-radius:50%;color:#fff;font-weight:900;line-height:1}
+.steps{flex:0 0 52px;height:52px;display:grid;grid-template-columns:repeat(2,1fr);background:#0d4d78;border-bottom:1px solid rgba(128,205,235,.75)}
+.step-tab{position:relative;display:flex;align-items:center;gap:7px;padding:0 9px;border:0;background:transparent;color:#b7d7e8;text-align:left;transition:background .14s,color .14s;min-width:0}
+.step-tab:hover{background:rgba(255,255,255,.05);color:#fff}
+.step-tab.active{color:#fff}
+.step-tab.active:after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;background:var(--cyan)}
+.step-tab + .step-tab:before{content:"";position:absolute;left:-1px;top:14px;bottom:14px;width:1px;background:rgba(150,214,240,.35)}
+.step-no{width:20px;height:20px;flex:0 0 20px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(160,220,245,.7);font:800 11px/1 var(--mono);color:#cdeaf7}
+.step-tab.active .step-no{background:var(--cyan);border-color:var(--cyan);color:#05314a}
+.step-tab.done .step-no{background:var(--success);border-color:var(--success);color:#05372a}
+.step-text{min-width:0;line-height:1.25}
+.step-text small{display:block;font-size:9px;letter-spacing:.06em;font-weight:800;opacity:.8}
+.step-text strong{display:block;font-size:12.5px;font-weight:900;white-space:nowrap}
+.panel-body{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:8px 10px 12px;scrollbar-width:thin;scrollbar-color:rgba(120,200,230,.55) transparent}
+.panel-body::-webkit-scrollbar{width:5px}
+.panel-body::-webkit-scrollbar-track{background:transparent}
+.panel-body::-webkit-scrollbar-thumb{background:rgba(120,200,230,.55);border-radius:999px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.actions{flex:0 0 74px;height:74px;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:13px 10px;background:#063d66;border-top:2px solid #17b8df}
+.page-head{padding:4px 2px 9px}
+.page-head h2{margin:0 0 3px;color:#fff;font-size:16px;font-weight:900;line-height:1.25}
+.page-head p{margin:0;color:#c8e4f2;font-size:11px;line-height:1.35}
+.section{margin:0;padding:0;border-top:1px solid rgba(219,245,255,.48)}
+.section:last-child{border-bottom:1px solid rgba(219,245,255,.38)}
+.sec-head{min-height:40px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px}
+.acc-btn{width:100%;min-height:40px;border:0;background:transparent;color:#fff;text-align:left;font-size:13px;font-weight:900;padding:0 2px;transition:background .14s}
+.acc-btn:hover{background:rgba(255,255,255,.035)}
+.acc-btn:before{content:"▾ ";color:#dff7ff}
+.section.collapsed .acc-btn:before{content:"▸ "}
+.sec-tools{display:flex;align-items:center;gap:6px;padding-right:2px;flex:0 0 auto;min-width:0}
+.sec-tools label{display:flex;align-items:center;gap:5px;width:auto;min-width:0;max-width:100%;white-space:nowrap;font-size:11px;line-height:1.2}
+.sec-body{display:grid;gap:10px;padding:4px 0 13px;animation:fadeIn .14s ease both}
+.section.collapsed .sec-body{display:none}
+@keyframes fadeIn{from{opacity:.7}to{opacity:1}}
+.field{display:grid;gap:4px;min-width:0}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.row3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+label,.label{font-size:12px;font-weight:750;color:#e4f2f9}
+label:has(> input[type="checkbox"]),label:has(> input[type="radio"]){display:flex;align-items:center;gap:6px;width:auto;min-width:0;max-width:100%;line-height:1.35}
+.req{color:var(--required);font-weight:900}
+.hint{font-size:11px;color:#c4e1ef;line-height:1.38}
+.info{border-left:3px solid var(--cyan);background:rgba(13,78,122,.74);padding:8px 9px;color:#d7edf6;font-size:11px;line-height:1.45}
+input:not([type="checkbox"]):not([type="radio"]),select{width:100%;min-width:0;height:36px;border:1px solid var(--border);border-radius:5px;background:var(--input);color:#fff;padding:7px 8px;outline:none;font-size:13px;transition:border-color .14s,box-shadow .14s,background .14s}
+input[type="checkbox"],input[type="radio"]{width:15px;height:15px;min-width:15px;min-height:15px;max-width:15px;max-height:15px;flex:0 0 15px;margin:0;padding:0;accent-color:var(--cyan);box-shadow:none;vertical-align:middle}
+input:not([type="checkbox"]):not([type="radio"])::placeholder{color:#a9c9d9}
+input:not([type="checkbox"]):not([type="radio"]):focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(37,220,229,.12);background:#114f7b}
+select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(45deg,transparent 50%,#dff8ff 50%),linear-gradient(135deg,#dff8ff 50%,transparent 50%);background-position:calc(100% - 14px) 15px,calc(100% - 9px) 15px;background-size:5px 5px;background-repeat:no-repeat;padding-right:26px}
+.field-error input:not([type="checkbox"]):not([type="radio"]),.field-error select,.field-error .file-drop{border-color:var(--error)!important;box-shadow:0 0 0 2px rgba(255,155,103,.18)!important}
+.error{display:none;color:#ffd1bd;font-size:11px;line-height:1.25}
+.field-error .error{display:block}
+.file-drop{position:relative;min-height:52px;width:100%;min-width:0;overflow:hidden;display:flex;align-items:center;gap:9px;border:1px dashed #8dcdea;border-radius:5px;background:#104a73;padding:8px;transition:border-color .14s,background .14s}
+.file-drop:hover{border-color:var(--cyan);background:#11527f}
+.file-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;max-width:none;max-height:none}
+.file-ico{width:31px;height:31px;flex:0 0 auto;display:grid;place-items:center;border:1px solid #7bc7ea;background:rgba(0,0,0,.08);color:#e9fbff;font-size:10px;font-weight:900}
+.file-drop strong{display:block;color:#fff;font-size:12px;line-height:1.25}
+.file-drop em{display:block;margin-top:2px;color:#c5dfec;font-size:11px;font-style:normal;line-height:1.25;overflow-wrap:anywhere}
+.file-drop.uploaded{border-color:var(--success);background:#0f5b76}
+.clear-file{display:none;position:absolute;right:5px;top:5px;z-index:2}
+.file-drop.uploaded .clear-file{display:block}
+.btn,.tiny,.link{height:34px;border:1px solid #bdeeff;border-radius:5px;background:#0e6da7;color:#fff;padding:0 10px;font-size:12px;font-weight:900;white-space:nowrap;transition:background .14s,border-color .14s,filter .14s}
+.btn:hover,.tiny:hover{filter:brightness(1.08)}
+.btn.primary{background:#00a7dc;border-color:#bff7ff}
+.btn.secondary{background:#0a4269;border-color:#9eddf2}
+.btn.outline{background:transparent;border-color:#7cc4e6;color:#dff3fc}
+.btn.block{width:100%}
+.tiny{height:28px;padding:0 8px}
+.danger{border-color:#d99a80;color:#ffd4c5;background:transparent}
+.danger:hover{background:rgba(255,155,103,.16)}
+.link{height:28px;border:0;background:transparent;color:#eaffff;padding:0 2px}
+.segmented{display:grid;gap:4px;padding:3px;border:1px solid var(--border);border-radius:5px;background:#0d4b75;grid-template-columns:repeat(3,minmax(0,1fr))}
+.segment{min-height:31px;border:0;border-radius:3px;background:#0e446c;color:#c7e2ef;font-size:12px;font-weight:900;transition:background .14s,color .14s}
+.segment:hover{background:#125782;color:#fff}
+.segment.active{background:var(--active);color:#fff}
+.mode-choice{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.mode-btn{position:relative;display:grid;gap:2px;padding:9px 8px;border:1px solid var(--border);border-radius:5px;background:#0e446c;color:#c7e2ef;text-align:left;min-width:0;transition:background .14s,border-color .14s,color .14s}
+.mode-btn:hover{background:#125782;color:#fff}
+.mode-btn.active{background:var(--active);border-color:var(--cyan);color:#fff}
+.mode-btn b{font-size:13px;font-weight:900}
+.mode-btn small{font-size:10px;line-height:1.35;color:#d3ecf7;overflow-wrap:anywhere}
+.mode-btn .auth-flag{display:none;font:800 9.5px/1 var(--mono);color:var(--success);letter-spacing:.04em}
+.mode-btn.authed .auth-flag{display:block}
+.input-mode-panel{display:none}
+.input-mode-panel.active{display:grid;gap:10px}
+.source-block{display:none;gap:10px}
+.source-block.active{display:grid}
+.card{display:grid;gap:9px;padding:10px;border:1px solid #3e87b0;border-radius:5px;background:#104f79}
+.card + .card{margin-top:2px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pill{display:inline-flex;align-items:center;height:22px;padding:0 7px;border:1px solid #8bd9f4;border-radius:3px;background:rgba(37,220,229,.08);color:#e5fbff;font:800 10px/1 var(--mono)}
+.material-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px}
+.param{padding:7px;border:1px solid #2b7caf;border-radius:4px;background:#0e456d}
+.param span{display:block;color:#b7d7e8;font-size:10px;line-height:1.2}
+.param strong{display:block;margin-top:3px;color:#fff;font:800 11px/1.25 var(--mono)}
+.warn{border:0;border-left:3px solid var(--required);background:rgba(137,91,16,.32);padding:9px 10px}
+.warn.ok{border-left-color:var(--success);background:rgba(35,142,107,.28)}
+.warn strong{display:block;color:var(--required);font-size:13px;margin-bottom:5px}
+.warn.ok strong{color:var(--success);margin-bottom:0}
+.warn ul{margin:0;padding-left:18px;font-size:12px;line-height:1.55;color:#fff3ca}
+.warn.ok ul{display:none}
+.sub{display:flex;align-items:center;gap:6px;color:#d9f6ff;font-size:11px;font-weight:900;letter-spacing:.05em}
+.sub:after{content:"";height:1px;background:#78bfdf;flex:1}
+.sub .state{flex:0 0 auto;font-size:10px;letter-spacing:0;font-weight:800}
+.state-dirty{color:var(--required)}
+.state-saved{color:var(--success)}
+.infile-settings{display:grid;gap:9px;max-height:0;overflow:hidden;opacity:0;transition:max-height .18s ease,opacity .16s ease,padding .16s ease}
+.infile-settings.open{max-height:1400px;opacity:1;border:1px solid #6bb8dd;background:#10517d;padding:8px}
+.infile-editor{display:none;gap:10px}
+.infile-editor.open{display:grid}
+.inline-unit{position:relative}
+.inline-unit span{position:absolute;right:8px;bottom:10px;color:#b7d7e8;font:11px/1 var(--mono);pointer-events:none}
+.editor-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.editor-actions .btn{padding:0 4px;font-size:11.5px}
+.success-box{display:none;gap:9px;margin:10px 0 2px;padding:11px 12px;border-left:3px solid var(--success);background:rgba(20,120,96,.28)}
+.success-box.open{display:grid}
+.success-box strong{color:var(--success);font-size:13px;font-weight:900}
+.success-box p{margin:0;color:#d8f4ec;font-size:11.5px;line-height:1.5}
+.success-files{display:grid;gap:3px;padding:8px;border:1px solid rgba(114,230,187,.35);background:rgba(4,45,62,.5)}
+.success-files span{color:#cfeee5;font:11px/1.5 var(--mono)}
+.success-actions{display:grid;gap:7px}
+.map-area{position:relative;width:100%;height:100vh;min-width:0;overflow:hidden;background:#06131d}
+.map-reference{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;display:block;background:#06131d;transform:scale(1.035);transform-origin:center center}
+.grid-preview{position:absolute;inset:0;display:none;pointer-events:none;z-index:5}
+.grid-preview.open{display:block}
+.grid-mesh{position:absolute;left:27%;top:23%;width:11%;height:24%;background:repeating-linear-gradient(0deg,rgba(37,220,229,.55) 0 1px,transparent 1px 13px),repeating-linear-gradient(90deg,rgba(37,220,229,.55) 0 1px,transparent 1px 13px),rgba(10,120,160,.16);border:1px solid rgba(37,220,229,.85);box-shadow:0 0 22px rgba(37,220,229,.25)}
+.grid-point{position:absolute;left:31.5%;top:33%;width:11px;height:11px;border-radius:50%;background:#ffd166;border:2px solid #fff;box-shadow:0 0 0 6px rgba(255,209,102,.22);transform:translate(-50%,-50%)}
+.grid-point:after{content:"注入點";position:absolute;left:15px;top:-6px;white-space:nowrap;padding:3px 6px;background:rgba(6,34,58,.86);border:1px solid rgba(37,220,229,.5);color:#fff;font-size:10px;font-weight:800}
+.preview-chip{position:absolute;left:20px;bottom:20px;display:flex;align-items:center;gap:10px;padding:9px 11px;background:rgba(6,34,58,.9);border:1px solid rgba(37,220,229,.55);color:#fff;font-size:11.5px;pointer-events:auto}
+.preview-chip b{display:block;font-size:12px}
+.preview-chip small{display:block;color:#a9d8e8;font:10px/1.4 var(--mono)}
+.toast{position:fixed;right:22px;top:22px;z-index:3000;max-width:390px;padding:10px 12px;border:1px solid #52c7e9;background:#063d66;color:#fff;box-shadow:0 10px 28px rgba(0,0,0,.35);opacity:0;transform:translateY(-8px);transition:.18s;font-size:12px;line-height:1.45}
+.toast.show{opacity:1;transform:none}
+.modal-overlay{position:fixed;inset:0;z-index:2500;display:none;place-items:center;padding:20px;background:rgba(0,12,24,.65)}
+.modal-overlay.open{display:grid}
+.modal{width:min(470px,calc(100vw - 32px));overflow:hidden;border:1px solid #8bd9f4;border-radius:5px;background:#115885;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.modal-head{height:50px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 12px 0 14px;background:#0787cf;border-bottom:1px solid #b7ecff}
+.modal-head strong{flex:1 1 auto;min-width:0;font-size:17px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-close{width:28px;height:28px;min-width:28px;max-width:28px;flex:0 0 28px;display:flex;align-items:center;justify-content:center;margin:0;padding:0;border:1px solid #fff;border-radius:50%;background:transparent;color:#fff;font-size:18px;line-height:1}
+.modal-close:hover{background:rgba(255,255,255,.14)}
+.modal-body{display:grid;gap:12px;padding:14px;background:#115885}
+.modal-lead{padding:10px;border-left:3px solid var(--cyan);background:#0f679c;color:#fff;font-weight:900;line-height:1.55}
+.verify-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center}
+.modal-footer{display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid #58b2db;background:#0a4269}
+.modal-footer .btn{height:34px;display:inline-flex;align-items:center;justify-content:center}
+.f1-stage{display:none;gap:12px}
+.f1-stage.active{display:grid}
+.choice{width:100%;display:grid;gap:3px;padding:12px;text-align:left;border:1px solid #6ec6ec;border-radius:5px;background:#0e6197;color:#fff;transition:background .14s,border-color .14s}
+.choice:hover{background:#1279b6;border-color:var(--cyan)}
+.choice b{font-size:13.5px;font-weight:900}
+.choice small{color:#cfeaf7;font-size:11px;line-height:1.45}
+@media(max-width:900px){:root{--panel:318px}.brand-copy strong{font-size:13px}.step-text strong{font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <header class="brand-head">
+      <div class="logo">NCHC</div>
+      <div class="brand-copy"><small>國家高速網路與計算中心</small><strong>海洋能及負碳高速運算平台</strong></div>
+    </header>
+
+    <nav class="rail" aria-label="圖台工具列">
+      <button class="active" title="分析"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></svg></button>
+      <button title="圖層"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/></svg></button>
+      <button title="定位"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.3"/></svg></button>
+      <button title="資料"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v12c0 1.7 3.1 3 7 3s7-1.3 7-3V5"/></svg></button>
+      <div class="bottom"><button title="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.8-1L14.4 3h-4.8l-.3 3.1a7 7 0 0 0-1.8 1l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.8 1l.3 3.1h4.8l.3-3.1a7 7 0 0 0 1.8-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1Z"/></svg></button></div>
+    </nav>
+
+    <section class="panel">
+      <div class="func-head">
+        <div class="func-title">
+          <svg class="func-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3"/></svg>
+          <span id="funcTitle">網格建置</span>
+        </div>
+        <div class="close-dot">×</div>
+      </div>
+
+      <div class="steps" role="tablist">
+        <button class="step-tab active" data-step="grid" type="button">
+          <span class="step-no" id="stepNoGrid">1</span>
+          <span class="step-text"><small>STEP 1</small><strong>網格建置</strong></span>
+        </button>
+        <button class="step-tab" data-step="analysis" type="button">
+          <span class="step-no">2</span>
+          <span class="step-text"><small>STEP 2</small><strong>模擬分析</strong></span>
+        </button>
+      </div>
+
+      <main class="panel-body" id="panelBody">
+        <!-- ================= STEP 1 ================= -->
+        <section class="tab-panel active" id="panel-grid">
+          <div class="page-head"><h2>網格建置</h2><p>設定地層與材料，建立分析所需網格成果。</p></div>
+
+          <div class="success-box" id="gridSuccess">
+            <strong>✓ 網格建立完成</strong>
+            <p>網格成果已成功產製，可下載完整成果或於圖台檢視網格。</p>
+            <div class="success-files" id="successFiles"></div>
+            <div class="success-actions">
+              <button class="btn primary block" id="goAnalysis" type="button">前往模擬分析 →</button>
+              <button class="btn block" id="viewGrid" type="button">檢視網格</button>
+              <button class="btn secondary block" id="downloadZip" type="button">↓ 下載成果 ZIP</button>
+            </div>
+          </div>
+
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 1｜地點與輸入模式</button></div>
+            <div class="sec-body">
+              <div class="field"><label>新地點名稱 <span class="req">*</span></label><input id="siteName" data-grid-required data-label="新地點名稱" value="taiwan_north_offshore_case_01"><div class="error">此欄位為必填</div></div>
+              <div class="field"><span class="label">YML / YAML 設定檔</span><div class="file-drop"><input id="yamlFile" data-label="YML / YAML 設定檔" type="file" accept=".yml,.yaml"><div class="file-ico">YML</div><div><strong>上傳設定檔</strong><em>選填，未上傳時使用目前介面設定</em></div></div></div>
+              <div class="field" id="formatField"><span class="label">輸入格式 <span class="req">*</span></span><div class="segmented"><button class="segment active" data-format="csv" type="button">CSV</button><button class="segment" data-format="vtu" type="button">VTU</button><button class="segment" data-format="stl" type="button">STL</button></div><div class="hint" id="formatHint">CSV 模式會呈現 Bottom / Interface / Top 的分層資料設定。</div></div>
+            </div>
+          </article>
+
+          <article class="section collapsed">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 2｜網格設定</button></div>
+            <div class="sec-body">
+              <div class="row3"><div class="field"><label>NX <span class="req">*</span></label><input data-grid-required data-label="NX" value="80"><div class="error">必填</div></div><div class="field"><label>NY <span class="req">*</span></label><input data-grid-required data-label="NY" value="80"><div class="error">必填</div></div><div class="field"><label>NZ <span class="req">*</span></label><input data-grid-required data-label="NZ" value="36"><div class="error">必填</div></div></div>
+              <div class="row"><div class="field"><label>Padding <span class="req">*</span></label><input data-grid-required data-label="Padding" value="1200"><div class="error">必填</div></div><div class="field"><label>Surface offset fraction <span class="req">*</span></label><input data-grid-required data-label="Surface offset fraction" value="0.02"><div class="error">必填</div></div></div>
+              <label><input id="cropFootprint" type="checkbox" checked> 依來源 footprint 裁切</label>
+              <div class="field"><label>裁切區域 <span class="req">*</span></label><input data-grid-required data-label="裁切區域" value="auto_from_source_extent"><div class="error">必填</div></div>
+              <div class="row"><div class="field"><label>Background material ID <span class="req">*</span></label><input data-grid-required data-label="Background material ID" value="1"><div class="error">必填</div></div><div class="field"><label>Material field <span class="req">*</span></label><input data-grid-required data-label="Material field" value="mat_id"><div class="error">必填</div></div></div>
+              <div class="row"><div class="field"><label>Top/bottom coarse layers <span class="req">*</span></label><input data-grid-required data-label="Top/bottom coarse layers" value="3 / 3"><div class="error">必填</div></div><div class="field"><label>Top/bottom guard layers <span class="req">*</span></label><input data-grid-required data-label="Top/bottom guard layers" value="1 / 1"><div class="error">必填</div></div></div>
+              <div class="row"><div class="field"><label>Coarse growth rate <span class="req">*</span></label><input data-grid-required data-label="Coarse growth rate" value="1.22"><div class="error">必填</div></div><div class="field"><label>Coarse max dz ratio <span class="req">*</span></label><input data-grid-required data-label="Coarse max dz ratio" value="4.0"><div class="error">必填</div></div></div>
+              <div class="field"><label>VTU 輸出檔名 <span class="req">*</span></label><input data-grid-required data-label="VTU 輸出檔名" value="taiwan_north_mesh.vtu"><div class="error">必填</div></div>
+            </div>
+          </article>
+
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 3｜輸入檔案</button></div>
+            <div class="sec-body">
+              <div class="input-mode-panel active" data-mode-panel="csv"><div id="csvList"></div><button class="btn" id="addCsv" type="button">＋ 新增界面</button></div>
+              <div class="input-mode-panel" data-mode-panel="vtu">
+                <div class="card"><div class="card-head"><span class="pill">VTU SOURCE</span></div><div class="field"><div class="file-drop"><input class="required-upload" data-label="來源 VTU 檔案" type="file" accept=".vtu"><div class="file-ico">VTU</div><div><strong>來源 VTU 檔案 <span class="req">*</span></strong><em>單一網格檔案</em></div></div><div class="error">請上傳檔案</div></div><div class="field"><label>VTU 檔案設定名稱 <span class="req">*</span></label><input data-input-required data-label="VTU 檔案設定名稱" value="reservoir_mesh_source"><div class="error">必填</div></div><div class="row"><div class="field"><label>材料欄位 <span class="req">*</span></label><input data-input-required data-label="VTU 材料欄位" value="material_id"><div class="error">必填</div></div><div class="field"><label>座標尺度 <span class="req">*</span></label><select data-input-required data-label="VTU 座標尺度"><option>meter</option><option>kilometer</option></select><div class="error">必填</div></div></div><label><input type="checkbox" checked> 載入後自動預覽網格範圍</label></div>
+              </div>
+              <div class="input-mode-panel" data-mode-panel="stl"><div id="stlList"></div><button class="btn" id="addStl" type="button">＋ 新增 STL</button></div>
+            </div>
+          </article>
+
+          <article class="section"><div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 4｜岩層 ROCK 設置</button></div><div class="sec-body" id="materialsList"></div></article>
+
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 5｜注入點位</button></div>
+            <div class="sec-body">
+              <div class="field"><label>X 經度 <span class="req">*</span></label><input id="xLon" data-grid-required data-label="X 經度" value="121.564780"><div class="error">此欄位為必填</div></div>
+              <div class="field"><label>Y 緯度 <span class="req">*</span></label><input id="yLat" data-grid-required data-label="Y 緯度" value="25.033964"><div class="error">此欄位為必填</div></div>
+              <div class="field"><label>Z 高度 <span class="req">*</span></label><input id="zHeight" data-grid-required data-label="Z 高度" value="-820"><div class="error">此欄位為必填</div></div>
+              <button class="btn" id="pickPoint" type="button">◎ 地圖點選</button>
+            </div>
+          </article>
+
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 6｜井周細化</button><div class="sec-tools"><label><input id="refineEnabled" type="checkbox" checked> 啟用</label></div></div>
+            <div class="sec-body" id="refineContent"><div class="hint">啟用後顯示井位設定；每個井位可擁有多層細化範圍。</div><div id="wellsList"></div><button class="btn" id="addWell" type="button">＋ 新增井位</button></div>
+          </article>
+
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 7｜同時生成 INFILE</button></div>
+            <div class="sec-body">
+              <label><input id="generateInfile" type="checkbox"> 同時生成 INFILE</label>
+              <div class="hint">未勾選時仍固定產生 VTU、MESH、config.json，並複製 data/taihsi/INCON。</div>
+              <div class="infile-settings" id="infileSettings">
+                <div class="sec-body">
+                  <div class="sub">初始條件</div>
+                  <div class="row">
+                    <div class="field inline-unit"><label>壓力 <span class="req">*</span></label><input id="gridInfilePressure" data-infile-required data-label="INFILE 壓力" value="99.67"><span>bar</span><div class="error">必填</div></div>
+                    <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="gridInfileTemp" data-infile-required data-label="INFILE 溫度" value="58.95"><span>°C</span><div class="error">必填</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="field"><label>鹽度 <span class="req">*</span></label><input id="gridInfileSalinity" data-infile-required data-label="INFILE 鹽度" value="0.032"><div class="error">必填</div></div>
+                    <div class="field"><label>CO₂ 分率 <span class="req">*</span></label><input id="gridInfileCo2" data-infile-required data-label="CO₂ 分率" value="1e-6"><div class="error">必填</div></div>
+                  </div>
+                  <div class="sub">注入條件</div>
+                  <div class="row">
+                    <div class="field"><label>注入速率 <span class="req">*</span></label><input id="gridInfileRate" data-infile-required data-label="注入速率" value="1.0"><div class="error">必填</div></div>
+                    <div class="field"><label>注入元素 <span class="req">*</span></label><input id="gridInfileElement" data-infile-required data-label="注入元素" value="A1 50"><div class="error">必填</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="field"><label>注入年數 <span class="req">*</span></label><input id="gridInfileInjectYears" data-infile-required data-label="注入年數" value="10"><div class="error">必填</div></div>
+                    <div class="field"><label>模擬年數 <span class="req">*</span></label><input id="gridInfileSimYears" data-infile-required data-label="模擬年數" value="50"><div class="error">必填</div></div>
+                  </div>
+                  <div class="sub">輸出設定</div>
+                  <div class="field"><label>時間輸出點 <span class="req">*</span></label><input id="gridInfileOutputTimes" data-infile-required data-label="時間輸出點" value="1y,5y,10y,20y,50y"><div class="hint">以逗號分隔多個輸出時間，例如：1y,5y,10y,20y,50y</div><div class="error">必填</div></div>
+                  <div class="field"><label>標題 <span class="req">*</span></label><input id="gridInfileTitle" data-infile-required data-label="模擬標題" value="北台灣近海 CO₂ 注入模擬"><div class="error">必填</div></div>
+                  <article class="section collapsed"><div class="sec-head"><button class="acc-btn" data-accordion type="button">讀取現有 INFILE</button></div><div class="sec-body"><div class="row"><input id="gridInfilePath" placeholder="輸入 INFILE 檔案路徑"><button class="btn" data-read-infile type="button">讀取</button></div></div></article>
+                </div>
+              </div>
+              <div class="warn" id="gridWarning"><strong>尚無法建立網格</strong><ul id="gridIssues"></ul></div>
+            </div>
+          </article>
+        </section>
+
+        <!-- ================= STEP 2 ================= -->
+        <section class="tab-panel" id="panel-analysis">
+          <div class="page-head"><h2>模擬分析</h2><p>使用已建立或既有網格執行 CO₂ 模擬分析。</p></div>
+
+          <!-- 1. 模擬來源 -->
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">模擬來源</button></div>
+            <div class="sec-body">
+              <div class="mode-choice">
+                <button class="mode-btn active" id="analysisSourceLocation" data-analysis-source="location" type="button"><b>地點選擇</b><small>使用既有網格成果</small></button>
+                <button class="mode-btn" id="analysisSourceUpload" data-analysis-source="upload" type="button"><b>自行上傳</b><small>上傳分析網格檔案</small></button>
+              </div>
+
+              <div class="source-block active" id="analysisLocationBlock">
+                <div class="field"><label>地點選擇 <span class="req">*</span></label><select id="analysisLocation"></select><div class="error">請選擇分析地點</div></div>
+                <div class="info" id="infileSourceNote">請先選擇地點，以載入對應 INFILE 設定。</div>
+
+                <div class="infile-editor" id="infileEditor">
+                  <div class="sub">INFILE 設定 <span class="state state-saved" id="infileStatus">已儲存</span></div>
+                  <div class="sub">初始條件</div>
+                  <div class="row">
+                    <div class="field inline-unit"><label>壓力 <span class="req">*</span></label><input id="anPressure" data-editor data-label="壓力"><span>bar</span><div class="error">必填</div></div>
+                    <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="anTemperature" data-editor data-label="溫度"><span>°C</span><div class="error">必填</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="field"><label>鹽度 <span class="req">*</span></label><input id="anSalinity" data-editor data-label="鹽度"><div class="error">必填</div></div>
+                    <div class="field"><label>CO₂ 分率 <span class="req">*</span></label><input id="anCo2Fraction" data-editor data-label="CO₂ 分率"><div class="error">必填</div></div>
+                  </div>
+                  <div class="sub">注入條件</div>
+                  <div class="row">
+                    <div class="field"><label>注入速率 <span class="req">*</span></label><input id="anInjectionRate" data-editor data-label="注入速率"><div class="error">必填</div></div>
+                    <div class="field"><label>注入元素 <span class="req">*</span></label><input id="anInjectionElement" data-editor data-label="注入元素"><div class="error">必填</div></div>
+                  </div>
+                  <div class="row">
+                    <div class="field"><label>注入年數 <span class="req">*</span></label><input id="anInjectionYears" data-editor data-label="注入年數"><div class="error">必填</div></div>
+                    <div class="field"><label>模擬年數 <span class="req">*</span></label><input id="anSimulationYears" data-editor data-label="模擬年數"><div class="error">必填</div></div>
+                  </div>
+                  <div class="sub">輸出設定</div>
+                  <div class="field"><label>時間輸出點 <span class="req">*</span></label><input id="anOutputTimes" data-editor data-label="時間輸出點"><div class="hint">以逗號分隔多個輸出時間，例如：1y,5y,10y,20y,50y</div><div class="error">必填</div></div>
+                  <div class="field"><label>標題 <span class="req">*</span></label><input id="anTitle" data-editor data-label="標題"><div class="error">必填</div></div>
+                  <div class="editor-actions">
+                    <button class="btn outline" id="infileRestore" type="button">回復預設</button>
+                    <button class="btn secondary" id="infileCancel" type="button">取消</button>
+                    <button class="btn primary" id="infileSave" type="button">儲存 INFILE</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="source-block" id="analysisUploadBlock">
+                <div class="info">自行上傳模式需提供 VTU 與 MESH 檔案。</div>
+                <div class="field">
+                  <span class="label">VTU <span class="req">*</span></span>
+                  <div class="file-drop"><input id="analysisVtuFile" type="file" accept=".vtu"><button class="tiny danger clear-file" data-clear-file type="button">清除</button><div class="file-ico">VTU</div><div><strong>上傳 VTU 檔案</strong><em>請選擇檔案</em></div></div>
+                  <div class="error">請上傳 VTU 檔案</div>
+                </div>
+                <div class="field">
+                  <span class="label">MESH <span class="req">*</span></span>
+                  <div class="file-drop"><input id="analysisMeshFile" type="file"><button class="tiny danger clear-file" data-clear-file type="button">清除</button><div class="file-ico">MESH</div><div><strong>上傳 MESH 檔案</strong><em>請選擇檔案</em></div></div>
+                  <div class="error">請上傳 MESH 檔案</div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 2. 分析輸入檔案 -->
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">分析輸入檔案</button></div>
+            <div class="sec-body">
+              <div class="info">CO2TAB 與 INCON 為選填；未上傳時系統將使用預設檔案。</div>
+              <div class="field"><span class="label">CO2TAB</span><div class="file-drop optional-file"><input id="co2tabFile" type="file"><button class="tiny danger clear-file" data-clear-file type="button">清除</button><div class="file-ico">TAB</div><div><strong>上傳 CO2TAB</strong><em>未上傳將使用系統預設 CO2TAB</em></div></div></div>
+              <div class="field"><span class="label">INCON</span><div class="file-drop optional-file"><input id="inconFile" type="file"><button class="tiny danger clear-file" data-clear-file type="button">清除</button><div class="file-ico">INC</div><div><strong>上傳 INCON</strong><em>未上傳將使用系統預設 INCON</em></div></div></div>
+            </div>
+          </article>
+
+          <!-- 3. 運算模式 -->
+          <article class="section">
+            <div class="sec-head"><button class="acc-btn" data-accordion type="button">運算模式</button></div>
+            <div class="sec-body">
+              <div class="mode-choice">
+                <button class="mode-btn active" data-run-mode="local" type="button"><b>本地運算</b><small>使用本地運算環境</small></button>
+                <button class="mode-btn" data-run-mode="f1" type="button"><b>F1運算</b><small>使用國網 F1 高速運算資源</small><span class="auth-flag">✓ 已驗證</span></button>
+              </div>
+              <div class="hint" id="runModeHint">目前使用本地運算環境執行模擬。</div>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <div class="actions">
+        <button class="btn secondary" id="resetBtn" type="button">重置參數</button>
+        <button class="btn primary" id="primaryAction" type="button">建立網格</button>
+      </div>
+    </section>
+  </aside>
+
+  <main class="map-area" aria-label="台灣圖台畫面">
+    <img class="map-reference" src="assets/images/map.jpg" alt="海洋能及負碳高速運算平台圖台">
+    <div class="grid-preview" id="gridPreview" aria-hidden="true">
+      <div class="grid-mesh"></div>
+      <div class="grid-point"></div>
+      <div class="preview-chip">
+        <div><b>網格預覽</b><small id="previewFile">final_mesh.vtu</small></div>
+        <button class="tiny" id="closePreview" type="button">關閉預覽</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="workflowOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="workflowTitle">
+    <div class="modal-head"><strong id="workflowTitle">開始分析前設定</strong><button class="modal-close" id="workflowClose" type="button" aria-label="關閉">×</button></div>
+    <div class="modal-body">
+      <div class="modal-lead">是否需要先建立新的網格？</div>
+      <div class="hint">若已有可使用的網格成果，可直接進入模擬分析。</div>
+      <button class="choice" id="chooseGrid" type="button"><b>建立新網格</b><small>從地層／網格資料開始建立新的分析網格。</small></button>
+      <button class="choice" id="chooseAnalysis" type="button"><b>直接進行分析</b><small>已有網格成果，不重新建立網格。</small></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="f1Overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="f1Title">
+    <div class="modal-head"><strong id="f1Title">F1 運算登入</strong><button class="modal-close" id="f1Close" type="button" aria-label="關閉">×</button></div>
+    <div class="modal-body">
+      <div class="f1-stage active" id="f1Stage1">
+        <div class="modal-lead">使用 F1 運算資源前，請先登入國網 F1 帳號。</div>
+        <div class="field"><label>帳號 <span class="req">*</span></label><input id="f1Account" placeholder="請輸入 F1 帳號" autocomplete="off"><div class="error">請輸入帳號</div></div>
+        <div class="field"><label>密碼 <span class="req">*</span></label><input id="f1Password" type="password" placeholder="請輸入密碼" autocomplete="off"><div class="error">請輸入密碼</div></div>
+      </div>
+      <div class="f1-stage" id="f1Stage2">
+        <div class="modal-lead">二階段驗證</div>
+        <div class="hint">請輸入二階段驗證碼以完成 F1 身分驗證。</div>
+        <div class="field"><label>驗證碼 <span class="req">*</span></label><input id="f1Code" placeholder="請輸入 6 位數驗證碼" inputmode="numeric" maxlength="6"><div class="error">請輸入 6 位數驗證碼</div></div>
+        <div class="info">Prototype 模式：輸入任意 6 位數字即可完成驗證。</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" id="f1Cancel" type="button">取消</button>
+      <button class="btn primary" id="f1Next" type="button">下一步</button>
+      <button class="btn secondary" id="f1Back" type="button" style="display:none">返回</button>
+      <button class="btn primary" id="f1Submit" type="button" style="display:none">驗證登入</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="analysisModalOverlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="analysisModalTitle">
+    <div class="modal-head"><strong id="analysisModalTitle">系統提示</strong><button class="modal-close" id="modalClose" type="button" aria-label="關閉">×</button></div>
+    <div class="modal-body">
+      <div class="modal-lead">目前分析需要約 1–2 天，請留下 Email，後續將提供分析結果。</div>
+      <div class="field" id="emailField"><label>Email <span class="req">*</span></label><input id="analysisEmail" placeholder="請輸入您的 Email"><div class="error">請輸入有效的 Email</div></div>
+      <div class="field" id="codeField"><label>驗證碼 <span class="req">*</span></label><div class="verify-row"><input id="analysisCode" placeholder="請輸入驗證碼"><button class="btn" id="sendVerifyBtn" type="button">寄送驗證信</button></div><div class="error">請先寄送驗證信並輸入驗證碼</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn secondary" id="modalCancel" type="button">取消</button><button class="btn primary" id="modalStartAnalysis" type="button" disabled>開始分析</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+
+const state={
+  step:"grid",
+  workflowInitialized:false,
+  gridCompleted:false,
+  gridPreview:false,
+  format:"csv",
+  analysisSource:"location",
+  selectedLocation:"",
+  runMode:"local",
+  f1Authenticated:false,
+  pendingAnalysisAfterF1:false,
+  infileDirty:false,
+  verifySent:false,
+  verifyOk:false,
+  csv:0,stl:0,mat:0,well:0
+};
+
+const ROCKS=[["r1","頭嵙山層"],["r2","卓蘭層"],["r3","錦水頁岩"],["r4","桂竹林層"],["r5","南莊層"],["r6","觀音山砂岩"],["r7","打鹿頁岩"],["r8","北寮層"],["r9","石底層"],["r10","碧靈頁岩"],["r11","木山層"],["r12","五指山層"]];
+
+const INFILE_FIELDS=["pressure","temperature","salinity","co2Fraction","injectionRate","injectionElement","injectionYears","simulationYears","outputTimes","title"];
+const EDITOR_IDS={
+  pressure:"anPressure",temperature:"anTemperature",salinity:"anSalinity",co2Fraction:"anCo2Fraction",
+  injectionRate:"anInjectionRate",injectionElement:"anInjectionElement",injectionYears:"anInjectionYears",
+  simulationYears:"anSimulationYears",outputTimes:"anOutputTimes",title:"anTitle"
+};
+const SYSTEM_DEFAULT={
+  pressure:"99.67",temperature:"58.95",salinity:"0.032",co2Fraction:"1e-6",
+  injectionRate:"1.0",injectionElement:"A1 50",injectionYears:"10",simulationYears:"50",
+  outputTimes:"1y,5y,10y,20y,50y",title:"CO₂ 注入模擬"
+};
+const INFILE_DEFAULTS={
+  "taiwan_north_offshore_case_01":{...SYSTEM_DEFAULT,title:"北台灣近海 CO₂ 注入模擬"},
+  "taihsi_reference_location":{...SYSTEM_DEFAULT,pressure:"104.20",temperature:"61.40",salinity:"0.035",injectionRate:"1.5",injectionElement:"CMN 1",injectionYears:"20",simulationYears:"80",outputTimes:"1y,10y,20y,40y,80y",title:"台西盆地參考案例"},
+  "existing_location_sample":{...SYSTEM_DEFAULT,pressure:"92.10",temperature:"54.30",salinity:"0.028",co2Fraction:"0",injectionRate:"0.8",injectionElement:"B2 10",injectionYears:"5",simulationYears:"30",outputTimes:"1y,5y,15y,30y",title:"既有地點範例模擬"}
+};
+const INFILE_SAVED={};
+const LOCATION_META={};
+Object.keys(INFILE_DEFAULTS).forEach(k=>{INFILE_SAVED[k]={...INFILE_DEFAULTS[k]};LOCATION_META[k]={hasCustom:true}});
+let locationList=Object.keys(INFILE_DEFAULTS);
+
+function toast(m){
+  const t=$("#toast");
+  if(!t)return;
+  t.textContent=m;
+  t.classList.add("show");
+  clearTimeout(toast.t);
+  toast.t=setTimeout(()=>t.classList.remove("show"),3000);
+}
+function field(el){return el?.closest(".field")||el?.closest(".card")||el?.closest(".section")}
+function clearErr(scope){(scope||document).querySelectorAll(".field-error").forEach(x=>x.classList.remove("field-error"))}
+function err(el,msg){
+  const f=field(el);
+  if(f){
+    f.classList.add("field-error");
+    const e=f.querySelector(".error");
+    if(e&&msg)e.textContent=msg;
+  }
+}
+function focusErr(scope){
+  const el=scope.querySelector(".field-error input:not([type='checkbox']):not([type='radio']),.field-error select");
+  if(!el)return;
+  el.closest(".section")?.classList.remove("collapsed");
+  setTimeout(()=>{el.scrollIntoView({block:"center",behavior:"smooth"});try{el.focus({preventScroll:true})}catch(_){}},60);
+}
+function req(el,label,issues){if(!el)return true;if(!String(el.value||"").trim()){issues.push(`請設定${label}`);err(el,"此欄位為必填");return false}return true}
+function reqFile(el,label,issues){if(!el)return true;if(!el.files||!el.files.length){issues.push(`請上傳${label}`);err(el,"請上傳檔案");return false}return true}
+
+/* ---------- STEP 1 builders ---------- */
+function rocksOptions(sel="r1"){return ROCKS.map(r=>`<option value="${r[0]}" ${r[0]===sel?"selected":""}>${r[0]}: ${r[1]}</option>`).join("")}
+function fileDrop(label,accept){return `<div class="field"><div class="file-drop"><input class="required-upload" data-label="${label}" type="file" accept="${accept}"><div class="file-ico">${accept.replace(".","").toUpperCase()}</div><div><strong>${label} <span class="req">*</span></strong><em>請選擇檔案</em></div></div><div class="error">請上傳檔案</div></div>`}
+function csvItem(role="Interface"){
+  state.csv++;
+  const extra=role==="Interface"?`<div class="row"><div class="field"><label>下方材料 ID <span class="req">*</span></label><input data-input-required data-label="${role} 下方材料 ID" value="2"><div class="error">必填</div></div><div class="field"><label>上方材料 ID <span class="req">*</span></label><input data-input-required data-label="${role} 上方材料 ID" value="1"><div class="error">必填</div></div></div>`:"";
+  return `<div class="card" data-dynamic="csv"><div class="card-head"><span class="pill">${role}</span><button class="tiny danger" data-remove type="button">刪除</button></div>${fileDrop(role+" CSV",".csv")}<div class="row"><div class="field"><label>角色 <span class="req">*</span></label><select data-input-required data-label="${role} 角色"><option>${role}</option><option>Bottom</option><option>Interface</option><option>Top</option></select><div class="error">必填</div></div><div class="field"><label>名稱 <span class="req">*</span></label><input data-input-required data-label="${role} 名稱" value="${role.toLowerCase()}_${state.csv}"><div class="error">必填</div></div></div>${extra}</div>`;
+}
+function stlItem(){
+  state.stl++;
+  return `<div class="card" data-dynamic="stl"><div class="card-head"><span class="pill">STL</span><button class="tiny danger" data-remove type="button">刪除</button></div>${fileDrop("STL 檔案",".stl")}<div class="row"><div class="field"><label>名稱 <span class="req">*</span></label><input data-input-required data-label="STL 名稱" value="stl_surface_${state.stl}"><div class="error">必填</div></div><div class="field"><label>材料 ID <span class="req">*</span></label><input data-input-required data-label="STL 材料 ID" value="${state.stl+2}"><div class="error">必填</div></div></div></div>`;
+}
+function material(){
+  state.mat++;
+  return `<div class="card" data-dynamic="mat"><div class="card-head"><span class="pill">ROCK ${state.mat}</span><button class="tiny danger" data-remove type="button">刪除</button></div><div class="row"><div class="field"><label>材料 ID</label><input value="${state.mat}"></div><div class="field"><label>ROCK preset</label><select class="rocks-select">${rocksOptions(state.mat===2?"r3":"r1")}</select></div></div><div class="material-grid"><div class="param"><span>密度</span><strong>2650 kg/m³</strong></div><div class="param"><span>孔隙率</span><strong>0.18</strong></div><div class="param"><span>滲透率 X</span><strong>1.2e-13</strong></div><div class="param"><span>滲透率 Y/Z</span><strong>1.2e-13 / 8e-14</strong></div></div></div>`;
+}
+function refineLayer(radius="1000"){
+  return `<div class="row" data-refine-layer><div class="field"><label>細化半徑 <span class="req">*</span></label><input data-refine-required data-label="細化半徑" value="${radius}"><div class="error">必填</div></div><div class="field"><label>迭代 <span class="req">*</span></label><input data-refine-required data-label="迭代" value="1"><div class="error">必填</div></div><button class="tiny danger" data-remove-refine type="button">×</button></div>`;
+}
+function well(){
+  state.well++;
+  return `<div class="card" data-well><div class="card-head"><span class="pill">井位 ${state.well}</span><button class="tiny danger" data-remove-well type="button">刪除</button></div><div class="field"><label>名稱 <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} 名稱" value="well_${state.well}"><div class="error">必填</div></div><div class="row3"><div class="field"><label>X <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} X" value="0"><div class="error">必填</div></div><div class="field"><label>Y <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} Y" value="0"><div class="error">必填</div></div><div class="field"><label>Z <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} Z" value="-500"><div class="error">必填</div></div></div><div data-refines>${refineLayer("1000")}${refineLayer("500")}</div><button class="btn" data-add-refine type="button">＋ 新增細化區</button></div>`;
+}
+function init(){
+  $("#csvList").innerHTML=csvItem("Bottom")+csvItem("Interface")+csvItem("Top");
+  $("#stlList").innerHTML=stlItem()+stlItem();
+  $("#materialsList").innerHTML=material()+material()+`<button class="btn" id="addMaterial" type="button">＋ 新增岩層</button>`;
+  $("#wellsList").innerHTML=well();
+}
+
+/* ---------- steps ---------- */
+function setStep(step){
+  state.step=step;
+  $$(".step-tab").forEach(b=>b.classList.toggle("active",b.dataset.step===step));
+  $("#panel-grid").classList.toggle("active",step==="grid");
+  $("#panel-analysis").classList.toggle("active",step==="analysis");
+  $("#funcTitle").textContent=step==="grid"?"網格建置":"模擬分析";
+  $("#primaryAction").textContent=step==="grid"?"建立網格":"執行分析";
+  $("#resetBtn").textContent=step==="grid"?"重置參數":"重置";
+  const body=$("#panelBody");
+  if(body)body.scrollTop=0;
+  if(step==="analysis"){hydrateLocations();renderAnalysisSource()}
+}
+
+/* ---------- analysis source ---------- */
+function renderAnalysisSource(){
+  const isLocation=state.analysisSource==="location";
+  $$("[data-analysis-source]").forEach(b=>b.classList.toggle("active",b.dataset.analysisSource===state.analysisSource));
+  $("#analysisLocationBlock").classList.toggle("active",isLocation);
+  $("#analysisUploadBlock").classList.toggle("active",!isLocation);
+}
+
+/* ---------- locations / INFILE editor ---------- */
+function hydrateLocations(){
+  const sel=$("#analysisLocation");
+  if(!sel)return;
+  const opts=[`<option value="">請選擇</option>`].concat(
+    locationList.map(x=>`<option value="${x}" ${x===state.selectedLocation?"selected":""}>${x}</option>`)
+  );
+  sel.innerHTML=opts.join("");
+  sel.value=state.selectedLocation||"";
+  toggleInfileEditor(!!state.selectedLocation);
+}
+function toggleInfileEditor(show){
+  $("#infileEditor").classList.toggle("open",!!show);
+  if(!show){
+    const note=$("#infileSourceNote");
+    if(note)note.textContent="請先選擇地點，以載入對應 INFILE 設定。";
+  }
+}
+function writeEditor(data){INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);if(el)el.value=data[k]??""})}
+function readEditor(){const out={};INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);out[k]=el?String(el.value):""});return out}
+function sameInfile(a,b){return INFILE_FIELDS.every(k=>String(a[k]??"")===String(b[k]??""))}
+function setDirty(dirty){
+  state.infileDirty=dirty;
+  const badge=$("#infileStatus");
+  if(!badge)return;
+  badge.textContent=dirty?"尚未儲存":"已儲存";
+  badge.classList.toggle("state-dirty",dirty);
+  badge.classList.toggle("state-saved",!dirty);
+}
+function loadLocation(loc){
+  if(!loc){toggleInfileEditor(false);return}
+  if(!INFILE_DEFAULTS[loc])INFILE_DEFAULTS[loc]={...SYSTEM_DEFAULT,title:loc};
+  if(!INFILE_SAVED[loc])INFILE_SAVED[loc]={...INFILE_DEFAULTS[loc]};
+  writeEditor(INFILE_SAVED[loc]);
+  setDirty(false);
+  clearErr($("#panel-analysis"));
+  toggleInfileEditor(true);
+  const note=$("#infileSourceNote");
+  if(note){
+    note.textContent=LOCATION_META[loc]?.hasCustom
+      ? "此地點已載入既有 INFILE 設定，可直接確認或修改。"
+      : "此地點尚未儲存自訂 INFILE，目前載入系統預設值。";
+  }
+}
+function saveInfile(){
+  const loc=state.selectedLocation;
+  if(!loc){toast("請先選擇地點。");return}
+  clearErr($("#panel-analysis"));
+  const missing=[];
+  INFILE_FIELDS.forEach(k=>{
+    const el=$("#"+EDITOR_IDS[k]);
+    if(el&&!String(el.value||"").trim()){missing.push(el.dataset.label||k);err(el,"此欄位為必填")}
+  });
+  if(missing.length){focusErr($("#panel-analysis"));toast("INFILE 尚有必填欄位未完成："+missing[0]);return}
+  INFILE_SAVED[loc]=readEditor();
+  LOCATION_META[loc]={hasCustom:true};
+  setDirty(false);
+  const note=$("#infileSourceNote");
+  if(note)note.textContent="此地點已載入既有 INFILE 設定，可直接確認或修改。";
+  toast("INFILE 設定已儲存。");
+}
+function cancelInfile(){
+  const loc=state.selectedLocation;
+  if(!loc)return;
+  writeEditor(INFILE_SAVED[loc]);
+  clearErr($("#panel-analysis"));
+  setDirty(false);
+  toast("已取消本次 INFILE 修改。");
+}
+function restoreInfile(){
+  const loc=state.selectedLocation;
+  if(!loc)return;
+  writeEditor(INFILE_DEFAULTS[loc]||SYSTEM_DEFAULT);
+  clearErr($("#panel-analysis"));
+  setDirty(!sameInfile(readEditor(),INFILE_SAVED[loc]||{}));
+  toast("已回復系統預設值，請確認後儲存。");
+}
+
+/* ---------- grid validate / success ---------- */
+function activeMode(el){const mode=el.closest(".input-mode-panel");return !(mode&&!mode.classList.contains("active"))}
+function validateGrid(focus){
+  clearErr($("#panel-grid"));
+  const issues=[];
+  req($("#siteName"),"新地點名稱",issues);
+  $$("#panel-grid [data-grid-required]").forEach(el=>{
+    if(el.id==="siteName")return;
+    if(!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||"欄位"}`);err(el,"此欄位為必填")}
+  });
+  const active=$(`#panel-grid [data-mode-panel="${state.format}"]`);
+  if(active){
+    active.querySelectorAll(".required-upload").forEach(i=>reqFile(i,i.dataset.label||"輸入檔案",issues));
+    active.querySelectorAll("[data-input-required]").forEach(el=>{
+      if(activeMode(el)&&!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||"欄位"}`);err(el,"此欄位為必填")}
+    });
+  }
+  if($("#refineEnabled").checked){
+    $$("#refineContent [data-well-required],#refineContent [data-refine-required]").forEach(el=>{
+      if(!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||"欄位"}`);err(el,"此欄位為必填")}
+    });
+  }
+  if($("#generateInfile").checked){
+    $$("#infileSettings [data-infile-required]").forEach(el=>{
+      if(!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||"欄位"}`);err(el,"此欄位為必填")}
+    });
+  }
+  const box=$("#gridWarning"),ul=$("#gridIssues");
+  if(box&&ul){
+    if(issues.length){
+      box.classList.remove("ok");
+      box.querySelector("strong").textContent="尚無法建立網格";
+      ul.innerHTML=issues.map(i=>`<li>${i}</li>`).join("");
+    }else{
+      box.classList.add("ok");
+      box.querySelector("strong").textContent="✓ 已符合網格建立條件";
+      ul.innerHTML="";
+    }
+  }
+  if(focus&&issues.length)focusErr($("#panel-grid"));
+  return issues;
+}
+function gridFiles(){
+  const files=["final_mesh.vtu","MESH","config.json","INCON"];
+  if($("#generateInfile").checked)files.push("INFILE");
+  return files;
+}
+function registerNewLocation(){
+  const site=($("#siteName")?.value||"").trim();
+  if(!site)return;
+  const withInfile=$("#generateInfile").checked;
+  const values=withInfile?{
+    pressure:$("#gridInfilePressure").value,
+    temperature:$("#gridInfileTemp").value,
+    salinity:$("#gridInfileSalinity").value,
+    co2Fraction:$("#gridInfileCo2").value,
+    injectionRate:$("#gridInfileRate").value,
+    injectionElement:$("#gridInfileElement").value,
+    injectionYears:$("#gridInfileInjectYears").value,
+    simulationYears:$("#gridInfileSimYears").value,
+    outputTimes:$("#gridInfileOutputTimes").value,
+    title:$("#gridInfileTitle").value
+  }:{...SYSTEM_DEFAULT,title:site};
+  INFILE_DEFAULTS[site]=INFILE_DEFAULTS[site]||{...SYSTEM_DEFAULT,title:site};
+  INFILE_SAVED[site]={...values};
+  LOCATION_META[site]={hasCustom:withInfile};
+  if(!locationList.includes(site))locationList=[site,...locationList];
+}
+function showGridSuccess(){
+  state.gridCompleted=true;
+  $("#stepNoGrid").textContent="✓";
+  $$(".step-tab")[0].classList.add("done");
+  $("#successFiles").innerHTML=gridFiles().map(f=>`<span>· ${f}</span>`).join("");
+  $("#gridSuccess").classList.add("open");
+  const body=$("#panelBody");
+  if(body)body.scrollTop=0;
+  registerNewLocation();
+}
+function goToAnalysisFromGrid(){
+  const site=($("#siteName")?.value||"").trim();
+  state.analysisSource="location";
+  state.selectedLocation=site&&locationList.includes(site)?site:"";
+  setStep("analysis");
+  hydrateLocations();
+  renderAnalysisSource();
+  if(state.selectedLocation){
+    loadLocation(state.selectedLocation);
+    toast(`已帶入地點 ${state.selectedLocation} 的 INFILE 設定。`);
+  }
+}
+function showGridPreview(){
+  state.gridPreview=true;
+  $("#gridPreview").classList.add("open");
+  $("#gridPreview").setAttribute("aria-hidden","false");
+  $("#previewFile").textContent=(($("#siteName")?.value||"").trim()||"taiwan_north")+" · final_mesh.vtu";
+  toast("已於圖台開啟網格預覽。");
+}
+function hideGridPreview(){
+  state.gridPreview=false;
+  $("#gridPreview").classList.remove("open");
+  $("#gridPreview").setAttribute("aria-hidden","true");
+}
+function downloadZip(){
+  const site=($("#siteName")?.value||"").trim()||"grid_result";
+  const manifest="Grid build result package\n\n"+gridFiles().map(f=>"- "+f).join("\n")+"\n";
+  const blob=new Blob([manifest],{type:"application/zip"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download=site+"_grid.zip";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1200);
+  toast("網格成果 ZIP 已開始下載。");
+}
+
+/* ---------- run mode / F1 ---------- */
+function paintRunMode(){
+  $$("[data-run-mode]").forEach(b=>b.classList.toggle("active",b.dataset.runMode===state.runMode));
+  const f1=$('[data-run-mode="f1"]');
+  if(f1)f1.classList.toggle("authed",state.f1Authenticated);
+  const hint=$("#runModeHint");
+  if(hint){
+    hint.textContent=state.runMode==="local"
+      ? "目前使用本地運算環境執行模擬。"
+      : (state.f1Authenticated?"目前使用國網 F1 高速運算資源執行模擬。":"已選擇 F1 運算，執行分析時將要求 F1 身分驗證。");
+  }
+}
+function paintF1Stage(){
+  const s1=state.f1LoginStep!==2;
+  $("#f1Stage1").classList.toggle("active",s1);
+  $("#f1Stage2").classList.toggle("active",!s1);
+  $("#f1Cancel").style.display=s1?"inline-flex":"none";
+  $("#f1Next").style.display=s1?"inline-flex":"none";
+  $("#f1Back").style.display=s1?"none":"inline-flex";
+  $("#f1Submit").style.display=s1?"none":"inline-flex";
+  $("#f1Title").textContent=s1?"F1 運算登入":"二階段驗證";
+}
+function openF1(){
+  state.f1LoginStep=1;
+  paintF1Stage();
+  const o=$("#f1Overlay");
+  o.classList.add("open");
+  o.setAttribute("aria-hidden","false");
+  clearErr(o);
+  setTimeout(()=>$("#f1Account").focus(),80);
+}
+function closeF1(){
+  const o=$("#f1Overlay");
+  o.classList.remove("open");
+  o.setAttribute("aria-hidden","true");
+}
+function cancelF1(){
+  state.pendingAnalysisAfterF1=false;
+  closeF1();
+  paintRunMode();
+}
+
+/* ---------- analysis validation / flow ---------- */
+function validateAnalysis(){
+  clearErr($("#panel-analysis"));
+  const issues=[];
+  if(state.analysisSource==="location"){
+    const sel=$("#analysisLocation");
+    if(!sel.value){issues.push("請選擇分析地點");err(sel,"請選擇分析地點")}
+    else{
+      INFILE_FIELDS.forEach(k=>{
+        const el=$("#"+EDITOR_IDS[k]);
+        if(el&&!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||k}`);err(el,"此欄位為必填")}
+      });
+    }
+  }else{
+    reqFile($("#analysisVtuFile"),"VTU 檔案",issues);
+    reqFile($("#analysisMeshFile"),"MESH 檔案",issues);
+  }
+  if(issues.length)focusErr($("#panel-analysis"));
+  return issues;
+}
+function beginAnalysis(){
+  const issues=validateAnalysis();
+  if(issues.length){toast(issues[0]);return}
+  if(state.runMode==="f1"&&!state.f1Authenticated){
+    state.pendingAnalysisAfterF1=true;
+    openF1();
+    return;
+  }
+  openModal();
+}
+
+/* ---------- email modal ---------- */
+function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
+function openWorkflowChooser(){const o=$("#workflowOverlay");o.classList.add("open");o.setAttribute("aria-hidden","false")}
+function closeWorkflowChooser(){const o=$("#workflowOverlay");o.classList.remove("open");o.setAttribute("aria-hidden","true");state.workflowInitialized=true}
+function openModal(){
+  const overlay=$("#analysisModalOverlay");
+  overlay.classList.add("open");
+  overlay.setAttribute("aria-hidden","false");
+  state.verifySent=false;state.verifyOk=false;
+  $("#analysisEmail").value="";
+  $("#analysisCode").value="";
+  $("#modalStartAnalysis").disabled=true;
+  clearErr(overlay);
+  setTimeout(()=>$("#analysisEmail").focus(),80);
+}
+function closeModal(){const overlay=$("#analysisModalOverlay");overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true")}
+function updateModal(){
+  clearErr($("#analysisModalOverlay"));
+  const email=$("#analysisEmail").value.trim();
+  const code=$("#analysisCode").value.trim();
+  if(email&&!validEmail(email))err($("#analysisEmail"),"請輸入有效的 Email");
+  state.verifyOk=validEmail(email)&&state.verifySent&&!!code;
+  $("#modalStartAnalysis").disabled=!state.verifyOk;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const stepTab=e.target.closest("[data-step]");
+  if(stepTab){setStep(stepTab.dataset.step);return}
+
+  const acc=e.target.closest("[data-accordion]");
+  if(acc&&!e.target.closest(".sec-tools")){acc.closest(".section")?.classList.toggle("collapsed");return}
+
+  const source=e.target.closest("[data-analysis-source]");
+  if(source){
+    state.analysisSource=source.dataset.analysisSource;
+    renderAnalysisSource();
+    clearErr($("#panel-analysis"));
+    toast(state.analysisSource==="location"?"模擬來源：地點選擇":"模擬來源：自行上傳（需 VTU + MESH）");
+    return;
+  }
+
+  const format=e.target.closest("[data-format]");
+  if(format){
+    state.format=format.dataset.format;
+    $$("[data-format]").forEach(b=>b.classList.toggle("active",b===format));
+    $$(".input-mode-panel").forEach(p=>p.classList.toggle("active",p.dataset.modePanel===state.format));
+    $("#formatHint").textContent=`${state.format.toUpperCase()} 模式已啟用。`;
+    toast(`已切換為 ${state.format.toUpperCase()}。`);
+    return;
+  }
+
+  const runMode=e.target.closest("[data-run-mode]");
+  if(runMode){
+    state.runMode=runMode.dataset.runMode;
+    paintRunMode();
+    toast(state.runMode==="local"?"已切換為本地運算。":(state.f1Authenticated?"已切換為 F1 運算。":"已選擇 F1 運算，執行分析時將進行身分驗證。"));
+    return;
+  }
+
+  const addRef=e.target.closest("[data-add-refine]");
+  if(addRef){addRef.previousElementSibling.insertAdjacentHTML("beforeend",refineLayer("750"));return}
+
+  const read=e.target.closest("[data-read-infile]");
+  if(read){
+    const map={gridInfilePressure:"101.25",gridInfileTemp:"60.00",gridInfileSalinity:"0.032",gridInfileCo2:"1e-6",gridInfileRate:"1.0",gridInfileElement:"A1 50",gridInfileInjectYears:"10",gridInfileSimYears:"50",gridInfileOutputTimes:"1y,5y,10y,20y,50y",gridInfileTitle:"既有 INFILE 解析模擬"};
+    Object.keys(map).forEach(id=>{const el=$("#"+id);if(el)el.value=map[id]});
+    toast("已讀取 INFILE，相關參數已帶入。");
+    return;
+  }
+
+  const clear=e.target.closest("[data-clear-file]");
+  if(clear){
+    const d=clear.closest(".file-drop"),i=d.querySelector("input[type=file]");
+    i.value="";d.classList.remove("uploaded");
+    const em=d.querySelector("em");
+    if(em){
+      if(i.id==="co2tabFile")em.textContent="未上傳將使用系統預設 CO2TAB";
+      else if(i.id==="inconFile")em.textContent="未上傳將使用系統預設 INCON";
+      else em.textContent="請選擇檔案";
+    }
+    toast("已清除上傳檔案");
+    return;
+  }
+
+  const remove=e.target.closest("[data-remove],[data-remove-well],[data-remove-refine]");
+  if(remove){
+    const item=remove.closest("[data-dynamic],[data-well],[data-refine-layer]");
+    if(item)item.remove();
+    return;
+  }
+
+  if(e.target.closest("#addCsv")){$("#csvList").insertAdjacentHTML("beforeend",csvItem("Interface"));return}
+  if(e.target.closest("#addStl")){$("#stlList").insertAdjacentHTML("beforeend",stlItem());return}
+  if(e.target.closest("#addMaterial")){$("#addMaterial").insertAdjacentHTML("beforebegin",material());return}
+  if(e.target.closest("#addWell")){$("#wellsList").insertAdjacentHTML("beforeend",well());return}
+
+  if(e.target.closest("#pickPoint")){
+    $("#xLon").value="121.612430";$("#yLat").value="25.184210";$("#zHeight").value="-905";
+    toast("已從圖台回填注入點座標");
+    return;
+  }
+
+  if(e.target.closest("#chooseGrid")){closeWorkflowChooser();setStep("grid");toast("已進入 STEP 1｜網格建置。");return}
+  if(e.target.closest("#chooseAnalysis")){
+    closeWorkflowChooser();
+    state.analysisSource="location";
+    state.selectedLocation="";
+    setStep("analysis");
+    hydrateLocations();
+    renderAnalysisSource();
+    toast("已略過網格建置，請先選擇分析地點或改用自行上傳。");
+    return;
+  }
+  if(e.target.closest("#workflowClose")){closeWorkflowChooser();return}
+
+  if(e.target.closest("#viewGrid")){showGridPreview();return}
+  if(e.target.closest("#closePreview")){hideGridPreview();return}
+  if(e.target.closest("#downloadZip")){downloadZip();return}
+  if(e.target.closest("#goAnalysis")){goToAnalysisFromGrid();return}
+
+  if(e.target.closest("#infileSave")){saveInfile();return}
+  if(e.target.closest("#infileCancel")){cancelInfile();return}
+  if(e.target.closest("#infileRestore")){restoreInfile();return}
+});
+
+document.addEventListener("change",e=>{
+  if(e.target.type==="file"){
+    const d=e.target.closest(".file-drop");
+    if(d){
+      if(e.target.files.length){
+        d.classList.add("uploaded");
+        const em=d.querySelector("em");
+        if(em)em.textContent=e.target.files[0].name;
+        field(e.target)?.classList.remove("field-error");
+      }else d.classList.remove("uploaded");
+    }
+  }
+  if(e.target.id==="generateInfile")$("#infileSettings").classList.toggle("open",e.target.checked);
+});
+
+document.addEventListener("input",e=>{
+  if(e.target.matches("[data-editor]")){
+    const loc=state.selectedLocation;
+    if(loc)setDirty(!sameInfile(readEditor(),INFILE_SAVED[loc]||{}));
+  }
+});
+
+$("#analysisLocation").addEventListener("change",e=>{
+  const next=e.target.value;
+  if(state.infileDirty&&state.selectedLocation){
+    const ok=window.confirm("目前 INFILE 尚有未儲存修改，是否放棄修改並切換地點？");
+    if(!ok){e.target.value=state.selectedLocation;return}
+  }
+  state.selectedLocation=next;
+  if(!next){
+    setDirty(false);
+    toggleInfileEditor(false);
+    return;
+  }
+  loadLocation(next);
+  toast(`已載入地點 ${next} 的 INFILE 設定。`);
+});
+
+/* F1 modal */
+$("#f1Next").onclick=()=>{
+  clearErr($("#f1Overlay"));
+  const acc=$("#f1Account").value.trim();
+  const pw=$("#f1Password").value.trim();
+  let ok=true;
+  if(!acc){err($("#f1Account"),"請輸入帳號");ok=false}
+  if(!pw){err($("#f1Password"),"請輸入密碼");ok=false}
+  if(!ok)return;
+  state.f1LoginStep=2;
+  paintF1Stage();
+  setTimeout(()=>$("#f1Code").focus(),60);
+};
+$("#f1Back").onclick=()=>{state.f1LoginStep=1;paintF1Stage();setTimeout(()=>$("#f1Account").focus(),60)};
+$("#f1Submit").onclick=()=>{
+  clearErr($("#f1Overlay"));
+  const code=$("#f1Code").value.trim();
+  if(!/^\d{6}$/.test(code)){err($("#f1Code"),"請輸入 6 位數驗證碼");return}
+  state.f1Authenticated=true;
+  state.runMode="f1";
+  paintRunMode();
+  closeF1();
+  toast("F1 身分驗證完成，可使用 F1 運算。");
+  if(state.pendingAnalysisAfterF1){
+    state.pendingAnalysisAfterF1=false;
+    setTimeout(openModal,180);
+  }
+};
+$("#f1Cancel").onclick=cancelF1;
+$("#f1Close").onclick=cancelF1;
+
+/* bottom CTA */
+$("#primaryAction").onclick=()=>{
+  if(state.step==="grid"){
+    if(validateGrid(true).length){toast("尚無法建立網格，請先完成必要條件。");return}
+    showGridSuccess();
+    toast($("#generateInfile").checked?"網格建立完成，並已同步生成 INFILE。":"網格建立完成。");
+  }else{
+    beginAnalysis();
+  }
+};
+$("#resetBtn").onclick=()=>{
+  if(state.step==="grid"){
+    toast("已重置網格建置參數。");
+  }else{
+    [["co2tabFile","未上傳將使用系統預設 CO2TAB"],["inconFile","未上傳將使用系統預設 INCON"],["analysisVtuFile","請選擇檔案"],["analysisMeshFile","請選擇檔案"]].forEach(([id,text])=>{
+      const i=$("#"+id);
+      if(!i)return;
+      i.value="";
+      const d=i.closest(".file-drop");
+      if(d){
+        d.classList.remove("uploaded");
+        const em=d.querySelector("em");
+        if(em)em.textContent=text;
+      }
+    });
+    clearErr($("#panel-analysis"));
+    toast("已重置模擬分析上傳檔案。");
+  }
+};
+
+/* email modal */
+$("#sendVerifyBtn").onclick=()=>{
+  if(!validEmail($("#analysisEmail").value.trim())){err($("#analysisEmail"),"請輸入有效的 Email");return}
+  state.verifySent=true;
+  toast("驗證信已寄送至您的 Email。");
+  updateModal();
+  $("#analysisCode").focus();
+};
+$("#analysisEmail").oninput=updateModal;
+$("#analysisCode").oninput=updateModal;
+$("#modalClose").onclick=closeModal;
+$("#modalCancel").onclick=closeModal;
+$("#modalStartAnalysis").onclick=()=>{
+  if(!state.verifyOk)return;
+  closeModal();
+  const mode=state.runMode==="f1"?"F1運算":"本地運算";
+  const source=state.analysisSource==="location"?`地點：${state.selectedLocation}`:"自行上傳網格";
+  const co2=$("#co2tabFile").files.length?"使用上傳 CO2TAB":"使用預設 CO2TAB";
+  const incon=$("#inconFile").files.length?"使用上傳 INCON":"使用預設 INCON";
+  toast(`分析任務已建立（${source}／${mode}／${co2}、${incon}），完成後將寄送結果至您的 Email。`);
+};
+
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  if($("#analysisModalOverlay").classList.contains("open"))closeModal();
+  if($("#f1Overlay").classList.contains("open"))cancelF1();
+  if($("#workflowOverlay").classList.contains("open"))closeWorkflowChooser();
+});
+
+/* boot */
+init();
+setStep("grid");
+hydrateLocations();
+renderAnalysisSource();
+paintRunMode();
+validateGrid(false);
+openWorkflowChooser();
+</script>
+</body>
+</html>
