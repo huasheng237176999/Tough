@@ -80,9 +80,11 @@ label:has(> input[type="checkbox"]),label:has(> input[type="radio"]){display:fle
 .hint{font-size:11px;color:#c4e1ef;line-height:1.38}
 .info{border-left:3px solid var(--cyan);background:rgba(13,78,122,.74);padding:8px 9px;color:#d7edf6;font-size:11px;line-height:1.45}
 input:not([type="checkbox"]):not([type="radio"]),select{width:100%;min-width:0;height:36px;border:1px solid var(--border);border-radius:5px;background:var(--input);color:#fff;padding:7px 8px;outline:none;font-size:13px;transition:border-color .14s,box-shadow .14s,background .14s}
+input[readonly]{background:#0c3c5e;color:#d7ecf7;border-style:dashed;cursor:default}
 input[type="checkbox"],input[type="radio"]{width:15px;height:15px;min-width:15px;min-height:15px;max-width:15px;max-height:15px;flex:0 0 15px;margin:0;padding:0;accent-color:var(--cyan);box-shadow:none;vertical-align:middle}
 input:not([type="checkbox"]):not([type="radio"])::placeholder{color:#a9c9d9}
 input:not([type="checkbox"]):not([type="radio"]):focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(37,220,229,.12);background:#114f7b}
+input[readonly]:focus{border-color:var(--border);box-shadow:none;background:#0c3c5e}
 select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(45deg,transparent 50%,#dff8ff 50%),linear-gradient(135deg,#dff8ff 50%,transparent 50%);background-position:calc(100% - 14px) 15px,calc(100% - 9px) 15px;background-size:5px 5px;background-repeat:no-repeat;padding-right:26px}
 .field-error input:not([type="checkbox"]):not([type="radio"]),.field-error select,.field-error .file-drop{border-color:var(--error)!important;box-shadow:0 0 0 2px rgba(255,155,103,.18)!important}
 .error{display:none;color:#ffd1bd;font-size:11px;line-height:1.25}
@@ -118,6 +120,10 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
 .mode-btn small{font-size:10px;line-height:1.35;color:#d3ecf7;overflow-wrap:anywhere}
 .mode-btn .auth-flag{display:none;font:800 9.5px/1 var(--mono);color:var(--success);letter-spacing:.04em}
 .mode-btn.authed .auth-flag{display:block}
+.pressure-choice{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;padding:3px;border:1px solid var(--border);border-radius:5px;background:#0d4b75}
+.pressure-btn{min-height:30px;border:0;border-radius:3px;background:#0e446c;color:#c7e2ef;font-size:12px;font-weight:900;transition:background .14s,color .14s}
+.pressure-btn:hover{background:#125782;color:#fff}
+.pressure-btn.active{background:var(--active);color:#fff}
 .input-mode-panel{display:none}
 .input-mode-panel.active{display:grid;gap:10px}
 .source-block{display:none;gap:10px}
@@ -142,7 +148,7 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
 .state-dirty{color:var(--required)}
 .state-saved{color:var(--success)}
 .infile-settings{display:grid;gap:9px;max-height:0;overflow:hidden;opacity:0;transition:max-height .18s ease,opacity .16s ease,padding .16s ease}
-.infile-settings.open{max-height:1400px;opacity:1;border:1px solid #6bb8dd;background:#10517d;padding:8px}
+.infile-settings.open{max-height:1600px;opacity:1;border:1px solid #6bb8dd;background:#10517d;padding:8px}
 .infile-editor{display:none;gap:10px}
 .infile-editor.open{display:grid}
 .inline-unit{position:relative}
@@ -268,7 +274,27 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
             <div class="sec-body">
               <div class="input-mode-panel active" data-mode-panel="csv"><div id="csvList"></div><button class="btn" id="addCsv" type="button">＋ 新增界面</button></div>
               <div class="input-mode-panel" data-mode-panel="vtu">
-                <div class="card"><div class="card-head"><span class="pill">VTU SOURCE</span></div><div class="field"><div class="file-drop"><input class="required-upload" data-label="來源 VTU 檔案" type="file" accept=".vtu"><div class="file-ico">VTU</div><div><strong>來源 VTU 檔案 <span class="req">*</span></strong><em>單一網格檔案</em></div></div><div class="error">請上傳檔案</div></div><div class="field"><label>VTU 檔案設定名稱 <span class="req">*</span></label><input data-input-required data-label="VTU 檔案設定名稱" value="reservoir_mesh_source"><div class="error">必填</div></div><div class="row"><div class="field"><label>材料欄位 <span class="req">*</span></label><input data-input-required data-label="VTU 材料欄位" value="material_id"><div class="error">必填</div></div><div class="field"><label>座標尺度 <span class="req">*</span></label><select data-input-required data-label="VTU 座標尺度"><option>meter</option><option>kilometer</option></select><div class="error">必填</div></div></div><label><input type="checkbox" checked> 載入後自動預覽網格範圍</label></div>
+                <div class="card">
+                  <div class="card-head"><span class="pill">VTU SOURCE</span></div>
+                  <div class="field">
+                    <div class="file-drop">
+                      <input class="required-upload" id="gridVtuSourceFile" data-label="來源 VTU 檔案" type="file" accept=".vtu">
+                      <button class="tiny danger clear-file" data-clear-file type="button">清除</button>
+                      <div class="file-ico">VTU</div>
+                      <div><strong>來源 VTU 檔案 <span class="req">*</span></strong><em>單一網格檔案</em></div>
+                    </div>
+                    <div class="error">請上傳檔案</div>
+                  </div>
+                  <div class="field">
+                    <label>VTU 檔案設定名稱</label>
+                    <input id="gridVtuConfigName" data-label="VTU 檔案設定名稱" placeholder="上傳後自動帶入" readonly>
+                    <div class="hint">依上傳的 VTU 檔名自動產生，不需手動輸入。</div>
+                  </div>
+                  <div class="row">
+                    <div class="field"><label>材料欄位 <span class="req">*</span></label><input data-input-required data-label="VTU 材料欄位" value="material_id"><div class="error">必填</div></div>
+                    <div class="field"><label>座標尺度 <span class="req">*</span></label><select data-input-required data-label="VTU 座標尺度"><option>meter</option><option>kilometer</option></select><div class="error">必填</div></div>
+                  </div>
+                </div>
               </div>
               <div class="input-mode-panel" data-mode-panel="stl"><div id="stlList"></div><button class="btn" id="addStl" type="button">＋ 新增 STL</button></div>
             </div>
@@ -299,10 +325,18 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
               <div class="infile-settings" id="infileSettings">
                 <div class="sec-body">
                   <div class="sub">初始條件</div>
+                  <div class="field">
+                    <span class="label">壓力設定方式 <span class="req">*</span></span>
+                    <div class="pressure-choice">
+                      <button class="pressure-btn active" data-pressure-scope="grid" data-pressure-mode="hydrostatic" type="button">靜水壓力</button>
+                      <button class="pressure-btn" data-pressure-scope="grid" data-pressure-mode="constant" type="button">常數</button>
+                    </div>
+                  </div>
                   <div class="row">
                     <div class="field inline-unit"><label>壓力 <span class="req">*</span></label><input id="gridInfilePressure" data-infile-required data-label="INFILE 壓力" value="99.67"><span>bar</span><div class="error">必填</div></div>
                     <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="gridInfileTemp" data-infile-required data-label="INFILE 溫度" value="58.95"><span>°C</span><div class="error">必填</div></div>
                   </div>
+                  <div class="hint" id="gridPressureNote">由系統預設 INCON 帶入。</div>
                   <div class="row">
                     <div class="field"><label>鹽質量分量 <span class="req">*</span></label><input id="gridInfileSalinity" data-infile-required data-label="鹽質量分量" value="0.032"><div class="error">必填</div></div>
                     <div class="field"><label>CO₂ 質量分量 <span class="req">*</span></label><input id="gridInfileCo2" data-infile-required data-label="CO₂ 質量分量" value="1e-6"><div class="error">必填</div></div>
@@ -362,10 +396,18 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
               <div class="infile-editor" id="infileEditor">
                 <div class="sub">INFILE 設定 <span class="state state-saved" id="infileStatus">已儲存</span></div>
                 <div class="sub">初始條件</div>
+                <div class="field">
+                  <span class="label">壓力設定方式 <span class="req">*</span></span>
+                  <div class="pressure-choice">
+                    <button class="pressure-btn active" data-pressure-scope="analysis" data-pressure-mode="hydrostatic" type="button">靜水壓力</button>
+                    <button class="pressure-btn" data-pressure-scope="analysis" data-pressure-mode="constant" type="button">常數</button>
+                  </div>
+                </div>
                 <div class="row">
                   <div class="field inline-unit"><label>壓力 <span class="req">*</span></label><input id="anPressure" data-editor data-label="壓力"><span>bar</span><div class="error">必填</div></div>
                   <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="anTemperature" data-editor data-label="溫度"><span>°C</span><div class="error">必填</div></div>
                 </div>
+                <div class="hint" id="analysisPressureNote">由系統預設 INCON 帶入。</div>
                 <div class="row">
                   <div class="field"><label>鹽質量分量 <span class="req">*</span></label><input id="anSalinity" data-editor data-label="鹽質量分量"><div class="error">必填</div></div>
                   <div class="field"><label>CO₂ 質量分量 <span class="req">*</span></label><input id="anCo2Fraction" data-editor data-label="CO₂ 質量分量"><div class="error">必填</div></div>
@@ -488,6 +530,9 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
 const $=s=>document.querySelector(s);
 const $$=s=>Array.from(document.querySelectorAll(s));
 
+const SYSTEM_INCON_PRESSURE="99.67";
+const UPLOADED_INCON_PRESSURE="101.32";
+
 const state={
   step:"grid",
   workflowInitialized:false,
@@ -501,6 +546,8 @@ const state={
   f1LoginStep:1,
   pendingAnalysisAfterF1:false,
   infileDirty:false,
+  gridPressureMode:"hydrostatic",
+  analysisPressureMode:"hydrostatic",
   verifySent:false,
   verifyOk:false,
   csv:0,stl:0,mat:0,well:0
@@ -515,21 +562,20 @@ const EDITOR_IDS={
   simulationYears:"anSimulationYears",outputTimes:"anOutputTimes",title:"anTitle"
 };
 const SYSTEM_DEFAULT={
-  pressure:"99.67",temperature:"58.95",salinity:"0.032",co2Fraction:"1e-6",
+  pressure:SYSTEM_INCON_PRESSURE,temperature:"58.95",salinity:"0.032",co2Fraction:"1e-6",
   injectionRate:"1.0",injectionElement:"A1 50",injectionYears:"10",simulationYears:"50",
-  outputTimes:"1y,5y,10y,20y,50y",title:"CO₂ 注入模擬"
+  outputTimes:"1y,5y,10y,20y,50y",title:"CO₂ 注入模擬",pressureMode:"hydrostatic"
 };
 const INFILE_DEFAULTS={
   "taiwan_north_offshore_case_01":{...SYSTEM_DEFAULT,title:"北台灣近海 CO₂ 注入模擬"},
-  "taihsi_reference_location":{...SYSTEM_DEFAULT,pressure:"104.20",temperature:"61.40",salinity:"0.035",injectionRate:"1.5",injectionElement:"CMN 1",injectionYears:"20",simulationYears:"80",outputTimes:"1y,10y,20y,40y,80y",title:"台西盆地參考案例"},
-  "existing_location_sample":{...SYSTEM_DEFAULT,pressure:"92.10",temperature:"54.30",salinity:"0.028",co2Fraction:"0",injectionRate:"0.8",injectionElement:"B2 10",injectionYears:"5",simulationYears:"30",outputTimes:"1y,5y,15y,30y",title:"既有地點範例模擬"}
+  "taihsi_reference_location":{...SYSTEM_DEFAULT,pressure:"104.20",pressureMode:"constant",temperature:"61.40",salinity:"0.035",injectionRate:"1.5",injectionElement:"CMN 1",injectionYears:"20",simulationYears:"80",outputTimes:"1y,10y,20y,40y,80y",title:"台西盆地參考案例"},
+  "existing_location_sample":{...SYSTEM_DEFAULT,pressure:"92.10",pressureMode:"constant",temperature:"54.30",salinity:"0.028",co2Fraction:"0",injectionRate:"0.8",injectionElement:"B2 10",injectionYears:"5",simulationYears:"30",outputTimes:"1y,5y,15y,30y",title:"既有地點範例模擬"}
 };
 const INFILE_SAVED={};
 const LOCATION_META={};
 Object.keys(INFILE_DEFAULTS).forEach(k=>{INFILE_SAVED[k]={...INFILE_DEFAULTS[k]};LOCATION_META[k]={hasCustom:true}});
 let locationList=Object.keys(INFILE_DEFAULTS);
 
-/* 自行上傳專用 INFILE state */
 const UPLOAD_INFILE_DEFAULT={...SYSTEM_DEFAULT,title:"自行上傳網格模擬"};
 let uploadInfileSaved={...UPLOAD_INFILE_DEFAULT};
 
@@ -552,13 +598,55 @@ function err(el,msg){
   }
 }
 function focusErr(scope){
-  const el=scope.querySelector(".field-error input:not([type='checkbox']):not([type='radio']),.field-error select");
+  const el=scope.querySelector(".field-error input:not([type='checkbox']):not([type='radio']):not([readonly]),.field-error select");
   if(!el)return;
   el.closest(".section")?.classList.remove("collapsed");
   setTimeout(()=>{el.scrollIntoView({block:"center",behavior:"smooth"});try{el.focus({preventScroll:true})}catch(_){}},60);
 }
 function req(el,label,issues){if(!el)return true;if(!String(el.value||"").trim()){issues.push(`請設定${label}`);err(el,"此欄位為必填");return false}return true}
 function reqFile(el,label,issues){if(!el)return true;if(!el.files||!el.files.length){issues.push(`請上傳${label}`);err(el,"請上傳檔案");return false}return true}
+function stripExt(name){return String(name||"").replace(/\.[^.]+$/,"")}
+
+/* ---------- INCON pressure source ---------- */
+function inconPressureInfo(){
+  const inconUploaded=!!$("#inconFile")?.files?.length;
+  return inconUploaded
+    ? {value:UPLOADED_INCON_PRESSURE,note:"由上傳的 INCON 壓力自動帶入。"}
+    : {value:SYSTEM_INCON_PRESSURE,note:"由系統預設 INCON 壓力自動帶入。"};
+}
+
+/* ---------- pressure mode ---------- */
+function applyGridPressureMode(){
+  const input=$("#gridInfilePressure");
+  const note=$("#gridPressureNote");
+  $$('[data-pressure-scope="grid"]').forEach(b=>b.classList.toggle("active",b.dataset.pressureMode===state.gridPressureMode));
+  if(!input)return;
+  if(state.gridPressureMode==="hydrostatic"){
+    const info=inconPressureInfo();
+    input.value=info.value;
+    input.readOnly=true;
+    if(note)note.textContent=info.note;
+  }else{
+    input.readOnly=false;
+    if(note)note.textContent="常數模式：可自行輸入固定壓力值 (bar)。";
+  }
+}
+function applyAnalysisPressureMode(recalc){
+  const input=$("#anPressure");
+  const note=$("#analysisPressureNote");
+  $$('[data-pressure-scope="analysis"]').forEach(b=>b.classList.toggle("active",b.dataset.pressureMode===state.analysisPressureMode));
+  if(!input)return;
+  if(state.analysisPressureMode==="hydrostatic"){
+    const info=inconPressureInfo();
+    if(recalc||!String(input.value||"").trim())input.value=info.value;
+    input.value=info.value;
+    input.readOnly=true;
+    if(note)note.textContent=info.note;
+  }else{
+    input.readOnly=false;
+    if(note)note.textContent="常數模式：可自行輸入固定壓力值 (bar)。";
+  }
+}
 
 /* ---------- STEP 1 builders ---------- */
 function rocksOptions(sel="r1"){return ROCKS.map(r=>`<option value="${r[0]}" ${r[0]===sel?"selected":""}>${r[0]}: ${r[1]}</option>`).join("")}
@@ -604,10 +692,22 @@ function setStep(step){
   if(step==="analysis"){hydrateLocations();renderAnalysisSource()}
 }
 
-/* ---------- INFILE editor shared ---------- */
-function writeEditor(data){INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);if(el)el.value=data[k]??""})}
-function readEditor(){const out={};INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);out[k]=el?String(el.value):""});return out}
-function sameInfile(a,b){return INFILE_FIELDS.every(k=>String(a[k]??"")===String(b[k]??""))}
+/* ---------- INFILE editor ---------- */
+function writeEditor(data){
+  INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);if(el)el.value=data[k]??""});
+  state.analysisPressureMode=data.pressureMode||"hydrostatic";
+  applyAnalysisPressureMode(state.analysisPressureMode==="hydrostatic");
+}
+function readEditor(){
+  const out={};
+  INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);out[k]=el?String(el.value):""});
+  out.pressureMode=state.analysisPressureMode;
+  return out;
+}
+function sameInfile(a,b){
+  const fieldsEqual=INFILE_FIELDS.every(k=>String(a[k]??"")===String(b[k]??""));
+  return fieldsEqual && String(a.pressureMode??"hydrostatic")===String(b.pressureMode??"hydrostatic");
+}
 function setDirty(dirty){
   state.infileDirty=dirty;
   const badge=$("#infileStatus");
@@ -699,7 +799,7 @@ function saveInfile(){
     if(note)note.textContent="此地點已載入既有 INFILE 設定，可直接確認或修改。";
   }
   setDirty(false);
-  toast("INFILE 設定已儲存。");
+  toast("INFILE 設定已儲存（含壓力設定方式）。");
 }
 function cancelInfile(){
   writeEditor(currentSaved());
@@ -767,6 +867,7 @@ function registerNewLocation(){
   const withInfile=$("#generateInfile").checked;
   const values=withInfile?{
     pressure:$("#gridInfilePressure").value,
+    pressureMode:state.gridPressureMode,
     temperature:$("#gridInfileTemp").value,
     salinity:$("#gridInfileSalinity").value,
     co2Fraction:$("#gridInfileCo2").value,
@@ -916,6 +1017,14 @@ function updateModal(){
   $("#modalStartAnalysis").disabled=!state.verifyOk;
 }
 
+/* ---------- VTU config name ---------- */
+function syncGridVtuName(){
+  const input=$("#gridVtuSourceFile");
+  const nameField=$("#gridVtuConfigName");
+  if(!input||!nameField)return;
+  nameField.value=input.files&&input.files.length?stripExt(input.files[0].name):"";
+}
+
 /* ---------- events ---------- */
 document.addEventListener("click",e=>{
   const stepTab=e.target.closest("[data-step]");
@@ -923,6 +1032,23 @@ document.addEventListener("click",e=>{
 
   const acc=e.target.closest("[data-accordion]");
   if(acc&&!e.target.closest(".sec-tools")){acc.closest(".section")?.classList.toggle("collapsed");return}
+
+  const pressureBtn=e.target.closest("[data-pressure-mode]");
+  if(pressureBtn){
+    const scope=pressureBtn.dataset.pressureScope;
+    const mode=pressureBtn.dataset.pressureMode;
+    if(scope==="grid"){
+      state.gridPressureMode=mode;
+      applyGridPressureMode();
+      toast(mode==="hydrostatic"?"壓力已改為靜水壓力，由 INCON 帶入。":"壓力已改為常數，可自行輸入。");
+    }else{
+      state.analysisPressureMode=mode;
+      applyAnalysisPressureMode(mode==="hydrostatic");
+      setDirty(!sameInfile(readEditor(),currentSaved()));
+      toast(mode==="hydrostatic"?"壓力已改為靜水壓力，由 INCON 帶入。":"壓力已改為常數，可自行輸入。");
+    }
+    return;
+  }
 
   const source=e.target.closest("[data-analysis-source]");
   if(source){
@@ -956,8 +1082,11 @@ document.addEventListener("click",e=>{
 
   const read=e.target.closest("[data-read-infile]");
   if(read){
-    const map={gridInfilePressure:"101.25",gridInfileTemp:"60.00",gridInfileSalinity:"0.032",gridInfileCo2:"1e-6",gridInfileRate:"1.0",gridInfileElement:"A1 50",gridInfileInjectYears:"10",gridInfileSimYears:"50",gridInfileOutputTimes:"1y,5y,10y,20y,50y",gridInfileTitle:"既有 INFILE 解析模擬"};
+    const map={gridInfileTemp:"60.00",gridInfileSalinity:"0.032",gridInfileCo2:"1e-6",gridInfileRate:"1.0",gridInfileElement:"A1 50",gridInfileInjectYears:"10",gridInfileSimYears:"50",gridInfileOutputTimes:"1y,5y,10y,20y,50y",gridInfileTitle:"既有 INFILE 解析模擬"};
     Object.keys(map).forEach(id=>{const el=$("#"+id);if(el)el.value=map[id]});
+    state.gridPressureMode="constant";
+    applyGridPressureMode();
+    $("#gridInfilePressure").value="101.25";
     toast("已讀取 INFILE，相關參數已帶入。");
     return;
   }
@@ -970,8 +1099,11 @@ document.addEventListener("click",e=>{
     if(em){
       if(i.id==="co2tabFile")em.textContent="未上傳將使用系統預設 CO2TAB";
       else if(i.id==="inconFile")em.textContent="未上傳將使用系統預設 INCON";
+      else if(i.id==="gridVtuSourceFile")em.textContent="單一網格檔案";
       else em.textContent="請選擇檔案";
     }
+    if(i.id==="gridVtuSourceFile")syncGridVtuName();
+    if(i.id==="inconFile"){applyGridPressureMode();applyAnalysisPressureMode(true)}
     if(i.id==="analysisVtuFile"||i.id==="analysisMeshFile")renderAnalysisSource();
     toast("已清除上傳檔案");
     return;
@@ -1029,9 +1161,18 @@ document.addEventListener("change",e=>{
         field(e.target)?.classList.remove("field-error");
       }else d.classList.remove("uploaded");
     }
+    if(e.target.id==="gridVtuSourceFile")syncGridVtuName();
+    if(e.target.id==="inconFile"){
+      applyGridPressureMode();
+      applyAnalysisPressureMode(true);
+      if($("#infileEditor").classList.contains("open"))setDirty(!sameInfile(readEditor(),currentSaved()));
+    }
     if(e.target.id==="analysisVtuFile"||e.target.id==="analysisMeshFile")renderAnalysisSource();
   }
-  if(e.target.id==="generateInfile")$("#infileSettings").classList.toggle("open",e.target.checked);
+  if(e.target.id==="generateInfile"){
+    $("#infileSettings").classList.toggle("open",e.target.checked);
+    if(e.target.checked)applyGridPressureMode();
+  }
 });
 
 document.addEventListener("input",e=>{
@@ -1104,6 +1245,7 @@ $("#resetBtn").onclick=()=>{
       }
     });
     clearErr($("#panel-analysis"));
+    applyAnalysisPressureMode(true);
     renderAnalysisSource();
     toast("已重置模擬分析上傳檔案。");
   }
@@ -1125,9 +1267,8 @@ $("#modalStartAnalysis").onclick=()=>{
   closeModal();
   const mode=state.runMode==="f1"?"F1運算":"本地運算";
   const source=state.analysisSource==="location"?`地點：${state.selectedLocation}`:"自行上傳網格";
-  const co2=$("#co2tabFile").files.length?"使用上傳 CO2TAB":"使用預設 CO2TAB";
-  const incon=$("#inconFile").files.length?"使用上傳 INCON":"使用預設 INCON";
-  toast(`分析任務已建立（${source}／${mode}／${co2}、${incon}），完成後將寄送結果至您的 Email。`);
+  const pressure=state.analysisPressureMode==="hydrostatic"?"靜水壓力":"常數壓力";
+  toast(`分析任務已建立（${source}／${mode}／${pressure}），完成後將寄送結果至您的 Email。`);
 };
 
 document.addEventListener("keydown",e=>{
@@ -1142,6 +1283,9 @@ setStep("grid");
 hydrateLocations();
 renderAnalysisSource();
 paintRunMode();
+applyGridPressureMode();
+applyAnalysisPressureMode(true);
+syncGridVtuName();
 validateGrid(false);
 openWorkflowChooser();
 </script>
