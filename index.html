@@ -73,6 +73,7 @@ button{cursor:pointer}
 .field{display:grid;gap:4px;min-width:0}
 .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .row3{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:7px}
+.refine-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
 label,.label{font-size:12px;font-weight:750;color:#e4f2f9}
 label:has(> input[type="checkbox"]),label:has(> input[type="radio"]){display:flex;align-items:center;gap:6px;width:auto;min-width:0;max-width:100%;line-height:1.35}
 .req{color:var(--required);font-weight:900}
@@ -252,13 +253,12 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
           <article class="section collapsed">
             <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 2｜網格設定</button></div>
             <div class="sec-body">
-              <div class="row3"><div class="field"><label>NX <span class="req">*</span></label><input data-grid-required data-label="NX" value="80"><div class="error">必填</div></div><div class="field"><label>NY <span class="req">*</span></label><input data-grid-required data-label="NY" value="80"><div class="error">必填</div></div><div class="field"><label>NZ <span class="req">*</span></label><input data-grid-required data-label="NZ" value="36"><div class="error">必填</div></div></div>
-              <div class="row"><div class="field"><label>Padding <span class="req">*</span></label><input data-grid-required data-label="Padding" value="1200"><div class="error">必填</div></div><div class="field"><label>Surface offset fraction <span class="req">*</span></label><input data-grid-required data-label="Surface offset fraction" value="0.02"><div class="error">必填</div></div></div>
-              <label><input id="cropFootprint" type="checkbox" checked> 依來源 footprint 裁切</label>
-              <div class="field"><label>裁切區域 <span class="req">*</span></label><input data-grid-required data-label="裁切區域" value="auto_from_source_extent"><div class="error">必填</div></div>
-              <div class="row"><div class="field"><label>Background material ID <span class="req">*</span></label><input data-grid-required data-label="Background material ID" value="1"><div class="error">必填</div></div><div class="field"><label>Material field <span class="req">*</span></label><input data-grid-required data-label="Material field" value="mat_id"><div class="error">必填</div></div></div>
-              <div class="row"><div class="field"><label>Top/bottom coarse layers <span class="req">*</span></label><input data-grid-required data-label="Top/bottom coarse layers" value="3 / 3"><div class="error">必填</div></div><div class="field"><label>Top/bottom guard layers <span class="req">*</span></label><input data-grid-required data-label="Top/bottom guard layers" value="1 / 1"><div class="error">必填</div></div></div>
-              <div class="row"><div class="field"><label>Coarse growth rate <span class="req">*</span></label><input data-grid-required data-label="Coarse growth rate" value="1.22"><div class="error">必填</div></div><div class="field"><label>Coarse max dz ratio <span class="req">*</span></label><input data-grid-required data-label="Coarse max dz ratio" value="4.0"><div class="error">必填</div></div></div>
+              <div class="row3">
+                <div class="field"><label>NX <span class="req">*</span></label><input data-grid-required data-label="NX" value="80"><div class="error">必填</div></div>
+                <div class="field"><label>NY <span class="req">*</span></label><input data-grid-required data-label="NY" value="80"><div class="error">必填</div></div>
+                <div class="field"><label>NZ <span class="req">*</span></label><input data-grid-required data-label="NZ" value="36"><div class="error">必填</div></div>
+              </div>
+              <div class="field"><label>Material field <span class="req">*</span></label><input data-grid-required data-label="Material field" value="mat_id"><div class="error">必填</div></div>
               <div class="field"><label>VTU 輸出檔名 <span class="req">*</span></label><input data-grid-required data-label="VTU 輸出檔名" value="taiwan_north_mesh.vtu"><div class="error">必填</div></div>
             </div>
           </article>
@@ -288,7 +288,7 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
 
           <article class="section">
             <div class="sec-head"><button class="acc-btn" data-accordion type="button">STEP 6｜井周細化</button><div class="sec-tools"><label><input id="refineEnabled" type="checkbox" checked> 啟用</label></div></div>
-            <div class="sec-body" id="refineContent"><div class="hint">啟用後顯示井位設定；每個井位可擁有多層細化範圍。</div><div id="wellsList"></div><button class="btn" id="addWell" type="button">＋ 新增井位</button></div>
+            <div class="sec-body" id="refineContent"><div class="hint">啟用後顯示井位設定；每個井位可擁有多層細化半徑。</div><div id="wellsList"></div><button class="btn" id="addWell" type="button">＋ 新增井位</button></div>
           </article>
 
           <article class="section">
@@ -304,12 +304,12 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
                     <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="gridInfileTemp" data-infile-required data-label="INFILE 溫度" value="58.95"><span>°C</span><div class="error">必填</div></div>
                   </div>
                   <div class="row">
-                    <div class="field"><label>鹽度 <span class="req">*</span></label><input id="gridInfileSalinity" data-infile-required data-label="INFILE 鹽度" value="0.032"><div class="error">必填</div></div>
-                    <div class="field"><label>CO₂ 分率 <span class="req">*</span></label><input id="gridInfileCo2" data-infile-required data-label="CO₂ 分率" value="1e-6"><div class="error">必填</div></div>
+                    <div class="field"><label>鹽質量分量 <span class="req">*</span></label><input id="gridInfileSalinity" data-infile-required data-label="鹽質量分量" value="0.032"><div class="error">必填</div></div>
+                    <div class="field"><label>CO₂ 質量分量 <span class="req">*</span></label><input id="gridInfileCo2" data-infile-required data-label="CO₂ 質量分量" value="1e-6"><div class="error">必填</div></div>
                   </div>
                   <div class="sub">注入條件</div>
                   <div class="row">
-                    <div class="field"><label>注入速率 <span class="req">*</span></label><input id="gridInfileRate" data-infile-required data-label="注入速率" value="1.0"><div class="error">必填</div></div>
+                    <div class="field"><label>質量流率 (kg/s) <span class="req">*</span></label><input id="gridInfileRate" data-infile-required data-label="質量流率 (kg/s)" value="1.0"><div class="error">必填</div></div>
                     <div class="field"><label>注入元素 <span class="req">*</span></label><input id="gridInfileElement" data-infile-required data-label="注入元素" value="A1 50"><div class="error">必填</div></div>
                   </div>
                   <div class="row">
@@ -331,7 +331,6 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
         <section class="tab-panel" id="panel-analysis">
           <div class="page-head"><h2>模擬分析</h2><p>使用已建立或既有網格執行 CO₂ 模擬分析。</p></div>
 
-          <!-- 1. 模擬來源 -->
           <article class="section">
             <div class="sec-head"><button class="acc-btn" data-accordion type="button">模擬來源</button></div>
             <div class="sec-body">
@@ -342,37 +341,6 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
 
               <div class="source-block active" id="analysisLocationBlock">
                 <div class="field"><label>地點選擇 <span class="req">*</span></label><select id="analysisLocation"></select><div class="error">請選擇分析地點</div></div>
-                <div class="info" id="infileSourceNote">請先選擇地點，以載入對應 INFILE 設定。</div>
-
-                <div class="infile-editor" id="infileEditor">
-                  <div class="sub">INFILE 設定 <span class="state state-saved" id="infileStatus">已儲存</span></div>
-                  <div class="sub">初始條件</div>
-                  <div class="row">
-                    <div class="field inline-unit"><label>壓力 <span class="req">*</span></label><input id="anPressure" data-editor data-label="壓力"><span>bar</span><div class="error">必填</div></div>
-                    <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="anTemperature" data-editor data-label="溫度"><span>°C</span><div class="error">必填</div></div>
-                  </div>
-                  <div class="row">
-                    <div class="field"><label>鹽度 <span class="req">*</span></label><input id="anSalinity" data-editor data-label="鹽度"><div class="error">必填</div></div>
-                    <div class="field"><label>CO₂ 分率 <span class="req">*</span></label><input id="anCo2Fraction" data-editor data-label="CO₂ 分率"><div class="error">必填</div></div>
-                  </div>
-                  <div class="sub">注入條件</div>
-                  <div class="row">
-                    <div class="field"><label>注入速率 <span class="req">*</span></label><input id="anInjectionRate" data-editor data-label="注入速率"><div class="error">必填</div></div>
-                    <div class="field"><label>注入元素 <span class="req">*</span></label><input id="anInjectionElement" data-editor data-label="注入元素"><div class="error">必填</div></div>
-                  </div>
-                  <div class="row">
-                    <div class="field"><label>注入年數 <span class="req">*</span></label><input id="anInjectionYears" data-editor data-label="注入年數"><div class="error">必填</div></div>
-                    <div class="field"><label>模擬年數 <span class="req">*</span></label><input id="anSimulationYears" data-editor data-label="模擬年數"><div class="error">必填</div></div>
-                  </div>
-                  <div class="sub">輸出設定</div>
-                  <div class="field"><label>時間輸出點 <span class="req">*</span></label><input id="anOutputTimes" data-editor data-label="時間輸出點"><div class="hint">以逗號分隔多個輸出時間，例如：1y,5y,10y,20y,50y</div><div class="error">必填</div></div>
-                  <div class="field"><label>標題 <span class="req">*</span></label><input id="anTitle" data-editor data-label="標題"><div class="error">必填</div></div>
-                  <div class="editor-actions">
-                    <button class="btn outline" id="infileRestore" type="button">回復預設</button>
-                    <button class="btn secondary" id="infileCancel" type="button">取消</button>
-                    <button class="btn primary" id="infileSave" type="button">儲存 INFILE</button>
-                  </div>
-                </div>
               </div>
 
               <div class="source-block" id="analysisUploadBlock">
@@ -388,10 +356,41 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
                   <div class="error">請上傳 MESH 檔案</div>
                 </div>
               </div>
+
+              <div class="info" id="infileSourceNote">請先選擇地點，以載入對應 INFILE 設定。</div>
+
+              <div class="infile-editor" id="infileEditor">
+                <div class="sub">INFILE 設定 <span class="state state-saved" id="infileStatus">已儲存</span></div>
+                <div class="sub">初始條件</div>
+                <div class="row">
+                  <div class="field inline-unit"><label>壓力 <span class="req">*</span></label><input id="anPressure" data-editor data-label="壓力"><span>bar</span><div class="error">必填</div></div>
+                  <div class="field inline-unit"><label>溫度 <span class="req">*</span></label><input id="anTemperature" data-editor data-label="溫度"><span>°C</span><div class="error">必填</div></div>
+                </div>
+                <div class="row">
+                  <div class="field"><label>鹽質量分量 <span class="req">*</span></label><input id="anSalinity" data-editor data-label="鹽質量分量"><div class="error">必填</div></div>
+                  <div class="field"><label>CO₂ 質量分量 <span class="req">*</span></label><input id="anCo2Fraction" data-editor data-label="CO₂ 質量分量"><div class="error">必填</div></div>
+                </div>
+                <div class="sub">注入條件</div>
+                <div class="row">
+                  <div class="field"><label>質量流率 (kg/s) <span class="req">*</span></label><input id="anInjectionRate" data-editor data-label="質量流率 (kg/s)"><div class="error">必填</div></div>
+                  <div class="field"><label>注入元素 <span class="req">*</span></label><input id="anInjectionElement" data-editor data-label="注入元素"><div class="error">必填</div></div>
+                </div>
+                <div class="row">
+                  <div class="field"><label>注入年數 <span class="req">*</span></label><input id="anInjectionYears" data-editor data-label="注入年數"><div class="error">必填</div></div>
+                  <div class="field"><label>模擬年數 <span class="req">*</span></label><input id="anSimulationYears" data-editor data-label="模擬年數"><div class="error">必填</div></div>
+                </div>
+                <div class="sub">輸出設定</div>
+                <div class="field"><label>時間輸出點 <span class="req">*</span></label><input id="anOutputTimes" data-editor data-label="時間輸出點"><div class="hint">以逗號分隔多個輸出時間，例如：1y,5y,10y,20y,50y</div><div class="error">必填</div></div>
+                <div class="field"><label>標題 <span class="req">*</span></label><input id="anTitle" data-editor data-label="標題"><div class="error">必填</div></div>
+                <div class="editor-actions">
+                  <button class="btn outline" id="infileRestore" type="button">回復預設</button>
+                  <button class="btn secondary" id="infileCancel" type="button">取消</button>
+                  <button class="btn primary" id="infileSave" type="button">儲存 INFILE</button>
+                </div>
+              </div>
             </div>
           </article>
 
-          <!-- 2. 分析輸入檔案 -->
           <article class="section">
             <div class="sec-head"><button class="acc-btn" data-accordion type="button">分析輸入檔案</button></div>
             <div class="sec-body">
@@ -401,7 +400,6 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
             </div>
           </article>
 
-          <!-- 3. 運算模式 -->
           <article class="section">
             <div class="sec-head"><button class="acc-btn" data-accordion type="button">運算模式</button></div>
             <div class="sec-body">
@@ -423,7 +421,7 @@ select{appearance:none;text-overflow:ellipsis;background-image:linear-gradient(4
   </aside>
 
   <main class="map-area" aria-label="台灣圖台畫面">
-    <img class="map-reference" src="assets/images/map.jpg" alt="海洋能及負碳高速運算平台圖台">
+    <img class="map-reference" src="mswn2tmy-image.png" alt="海洋能及負碳高速運算平台圖台">
     <div class="grid-preview" id="gridPreview" aria-hidden="true">
       <div class="grid-mesh"></div>
       <div class="grid-point"></div>
@@ -500,6 +498,7 @@ const state={
   selectedLocation:"",
   runMode:"local",
   f1Authenticated:false,
+  f1LoginStep:1,
   pendingAnalysisAfterF1:false,
   infileDirty:false,
   verifySent:false,
@@ -529,6 +528,10 @@ const INFILE_SAVED={};
 const LOCATION_META={};
 Object.keys(INFILE_DEFAULTS).forEach(k=>{INFILE_SAVED[k]={...INFILE_DEFAULTS[k]};LOCATION_META[k]={hasCustom:true}});
 let locationList=Object.keys(INFILE_DEFAULTS);
+
+/* 自行上傳專用 INFILE state */
+const UPLOAD_INFILE_DEFAULT={...SYSTEM_DEFAULT,title:"自行上傳網格模擬"};
+let uploadInfileSaved={...UPLOAD_INFILE_DEFAULT};
 
 function toast(m){
   const t=$("#toast");
@@ -574,11 +577,11 @@ function material(){
   return `<div class="card" data-dynamic="mat"><div class="card-head"><span class="pill">ROCK ${state.mat}</span><button class="tiny danger" data-remove type="button">刪除</button></div><div class="row"><div class="field"><label>材料 ID</label><input value="${state.mat}"></div><div class="field"><label>ROCK preset</label><select class="rocks-select">${rocksOptions(state.mat===2?"r3":"r1")}</select></div></div><div class="material-grid"><div class="param"><span>密度</span><strong>2650 kg/m³</strong></div><div class="param"><span>孔隙率</span><strong>0.18</strong></div><div class="param"><span>滲透率 X</span><strong>1.2e-13</strong></div><div class="param"><span>滲透率 Y/Z</span><strong>1.2e-13 / 8e-14</strong></div></div></div>`;
 }
 function refineLayer(radius="1000"){
-  return `<div class="row" data-refine-layer><div class="field"><label>細化半徑 <span class="req">*</span></label><input data-refine-required data-label="細化半徑" value="${radius}"><div class="error">必填</div></div><div class="field"><label>迭代 <span class="req">*</span></label><input data-refine-required data-label="迭代" value="1"><div class="error">必填</div></div><button class="tiny danger" data-remove-refine type="button">×</button></div>`;
+  return `<div class="refine-row" data-refine-layer><div class="field"><label>細化半徑 <span class="req">*</span></label><input data-refine-required data-label="細化半徑" value="${radius}"><div class="error">必填</div></div><button class="tiny danger" data-remove-refine type="button">×</button></div>`;
 }
 function well(){
   state.well++;
-  return `<div class="card" data-well><div class="card-head"><span class="pill">井位 ${state.well}</span><button class="tiny danger" data-remove-well type="button">刪除</button></div><div class="field"><label>名稱 <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} 名稱" value="well_${state.well}"><div class="error">必填</div></div><div class="row3"><div class="field"><label>X <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} X" value="0"><div class="error">必填</div></div><div class="field"><label>Y <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} Y" value="0"><div class="error">必填</div></div><div class="field"><label>Z <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} Z" value="-500"><div class="error">必填</div></div></div><div data-refines>${refineLayer("1000")}${refineLayer("500")}</div><button class="btn" data-add-refine type="button">＋ 新增細化區</button></div>`;
+  return `<div class="card" data-well><div class="card-head"><span class="pill">井位 ${state.well}</span><button class="tiny danger" data-remove-well type="button">刪除</button></div><div class="field"><label>名稱 <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} 名稱" value="well_${state.well}"><div class="error">必填</div></div><div class="row"><div class="field"><label>X <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} X" value="0"><div class="error">必填</div></div><div class="field"><label>Y <span class="req">*</span></label><input data-well-required data-label="井位 ${state.well} Y" value="0"><div class="error">必填</div></div></div><div data-refines>${refineLayer("1000")}${refineLayer("500")}</div><button class="btn" data-add-refine type="button">＋ 新增細化區</button></div>`;
 }
 function init(){
   $("#csvList").innerHTML=csvItem("Bottom")+csvItem("Interface")+csvItem("Top");
@@ -601,32 +604,7 @@ function setStep(step){
   if(step==="analysis"){hydrateLocations();renderAnalysisSource()}
 }
 
-/* ---------- analysis source ---------- */
-function renderAnalysisSource(){
-  const isLocation=state.analysisSource==="location";
-  $$("[data-analysis-source]").forEach(b=>b.classList.toggle("active",b.dataset.analysisSource===state.analysisSource));
-  $("#analysisLocationBlock").classList.toggle("active",isLocation);
-  $("#analysisUploadBlock").classList.toggle("active",!isLocation);
-}
-
-/* ---------- locations / INFILE editor ---------- */
-function hydrateLocations(){
-  const sel=$("#analysisLocation");
-  if(!sel)return;
-  const opts=[`<option value="">請選擇</option>`].concat(
-    locationList.map(x=>`<option value="${x}" ${x===state.selectedLocation?"selected":""}>${x}</option>`)
-  );
-  sel.innerHTML=opts.join("");
-  sel.value=state.selectedLocation||"";
-  toggleInfileEditor(!!state.selectedLocation);
-}
-function toggleInfileEditor(show){
-  $("#infileEditor").classList.toggle("open",!!show);
-  if(!show){
-    const note=$("#infileSourceNote");
-    if(note)note.textContent="請先選擇地點，以載入對應 INFILE 設定。";
-  }
-}
+/* ---------- INFILE editor shared ---------- */
 function writeEditor(data){INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);if(el)el.value=data[k]??""})}
 function readEditor(){const out={};INFILE_FIELDS.forEach(k=>{const el=$("#"+EDITOR_IDS[k]);out[k]=el?String(el.value):""});return out}
 function sameInfile(a,b){return INFILE_FIELDS.every(k=>String(a[k]??"")===String(b[k]??""))}
@@ -638,24 +616,72 @@ function setDirty(dirty){
   badge.classList.toggle("state-dirty",dirty);
   badge.classList.toggle("state-saved",!dirty);
 }
-function loadLocation(loc){
-  if(!loc){toggleInfileEditor(false);return}
-  if(!INFILE_DEFAULTS[loc])INFILE_DEFAULTS[loc]={...SYSTEM_DEFAULT,title:loc};
-  if(!INFILE_SAVED[loc])INFILE_SAVED[loc]={...INFILE_DEFAULTS[loc]};
-  writeEditor(INFILE_SAVED[loc]);
-  setDirty(false);
-  clearErr($("#panel-analysis"));
-  toggleInfileEditor(true);
+function currentSaved(){
+  if(state.analysisSource==="upload")return uploadInfileSaved;
+  const loc=state.selectedLocation;
+  return loc?(INFILE_SAVED[loc]||{}):{};
+}
+function currentDefault(){
+  if(state.analysisSource==="upload")return UPLOAD_INFILE_DEFAULT;
+  const loc=state.selectedLocation;
+  return loc?(INFILE_DEFAULTS[loc]||SYSTEM_DEFAULT):SYSTEM_DEFAULT;
+}
+function uploadReady(){
+  return !!($("#analysisVtuFile")?.files?.length && $("#analysisMeshFile")?.files?.length);
+}
+function toggleInfileEditor(show){$("#infileEditor").classList.toggle("open",!!show)}
+function renderAnalysisSource(){
+  const isLocation=state.analysisSource==="location";
+  $$("[data-analysis-source]").forEach(b=>b.classList.toggle("active",b.dataset.analysisSource===state.analysisSource));
+  $("#analysisLocationBlock").classList.toggle("active",isLocation);
+  $("#analysisUploadBlock").classList.toggle("active",!isLocation);
   const note=$("#infileSourceNote");
-  if(note){
-    note.textContent=LOCATION_META[loc]?.hasCustom
-      ? "此地點已載入既有 INFILE 設定，可直接確認或修改。"
-      : "此地點尚未儲存自訂 INFILE，目前載入系統預設值。";
+
+  if(isLocation){
+    if(state.selectedLocation){
+      writeEditor(INFILE_SAVED[state.selectedLocation]||SYSTEM_DEFAULT);
+      setDirty(false);
+      toggleInfileEditor(true);
+      if(note)note.textContent=LOCATION_META[state.selectedLocation]?.hasCustom
+        ? "此地點已載入既有 INFILE 設定，可直接確認或修改。"
+        : "此地點尚未儲存自訂 INFILE，目前載入系統預設值。";
+    }else{
+      toggleInfileEditor(false);
+      setDirty(false);
+      if(note)note.textContent="請先選擇地點，以載入對應 INFILE 設定。";
+    }
+  }else{
+    if(uploadReady()){
+      writeEditor(uploadInfileSaved);
+      setDirty(false);
+      toggleInfileEditor(true);
+      if(note)note.textContent="自行上傳網格的 INFILE 設定，可依需求調整後儲存。";
+    }else{
+      toggleInfileEditor(false);
+      setDirty(false);
+      if(note)note.textContent="請完成 VTU 與 MESH 上傳後設定 INFILE。";
+    }
   }
 }
+function hydrateLocations(){
+  const sel=$("#analysisLocation");
+  if(!sel)return;
+  const opts=[`<option value="">請選擇</option>`].concat(
+    locationList.map(x=>`<option value="${x}" ${x===state.selectedLocation?"selected":""}>${x}</option>`)
+  );
+  sel.innerHTML=opts.join("");
+  sel.value=state.selectedLocation||"";
+}
+function loadLocation(loc){
+  if(!loc){renderAnalysisSource();return}
+  if(!INFILE_DEFAULTS[loc])INFILE_DEFAULTS[loc]={...SYSTEM_DEFAULT,title:loc};
+  if(!INFILE_SAVED[loc])INFILE_SAVED[loc]={...INFILE_DEFAULTS[loc]};
+  clearErr($("#panel-analysis"));
+  renderAnalysisSource();
+}
 function saveInfile(){
-  const loc=state.selectedLocation;
-  if(!loc){toast("請先選擇地點。");return}
+  if(state.analysisSource==="location"&&!state.selectedLocation){toast("請先選擇地點。");return}
+  if(state.analysisSource==="upload"&&!uploadReady()){toast("請先完成 VTU 與 MESH 上傳。");return}
   clearErr($("#panel-analysis"));
   const missing=[];
   INFILE_FIELDS.forEach(k=>{
@@ -663,27 +689,28 @@ function saveInfile(){
     if(el&&!String(el.value||"").trim()){missing.push(el.dataset.label||k);err(el,"此欄位為必填")}
   });
   if(missing.length){focusErr($("#panel-analysis"));toast("INFILE 尚有必填欄位未完成："+missing[0]);return}
-  INFILE_SAVED[loc]=readEditor();
-  LOCATION_META[loc]={hasCustom:true};
+  if(state.analysisSource==="upload"){
+    uploadInfileSaved=readEditor();
+  }else{
+    const loc=state.selectedLocation;
+    INFILE_SAVED[loc]=readEditor();
+    LOCATION_META[loc]={hasCustom:true};
+    const note=$("#infileSourceNote");
+    if(note)note.textContent="此地點已載入既有 INFILE 設定，可直接確認或修改。";
+  }
   setDirty(false);
-  const note=$("#infileSourceNote");
-  if(note)note.textContent="此地點已載入既有 INFILE 設定，可直接確認或修改。";
   toast("INFILE 設定已儲存。");
 }
 function cancelInfile(){
-  const loc=state.selectedLocation;
-  if(!loc)return;
-  writeEditor(INFILE_SAVED[loc]);
+  writeEditor(currentSaved());
   clearErr($("#panel-analysis"));
   setDirty(false);
   toast("已取消本次 INFILE 修改。");
 }
 function restoreInfile(){
-  const loc=state.selectedLocation;
-  if(!loc)return;
-  writeEditor(INFILE_DEFAULTS[loc]||SYSTEM_DEFAULT);
+  writeEditor(currentDefault());
   clearErr($("#panel-analysis"));
-  setDirty(!sameInfile(readEditor(),INFILE_SAVED[loc]||{}));
+  setDirty(!sameInfile(readEditor(),currentSaved()));
   toast("已回復系統預設值，請確認後儲存。");
 }
 
@@ -772,10 +799,7 @@ function goToAnalysisFromGrid(){
   setStep("analysis");
   hydrateLocations();
   renderAnalysisSource();
-  if(state.selectedLocation){
-    loadLocation(state.selectedLocation);
-    toast(`已帶入地點 ${state.selectedLocation} 的 INFILE 設定。`);
-  }
+  if(state.selectedLocation)toast(`已帶入地點 ${state.selectedLocation} 的 INFILE 設定。`);
 }
 function showGridPreview(){
   state.gridPreview=true;
@@ -832,33 +856,26 @@ function openF1(){
   clearErr(o);
   setTimeout(()=>$("#f1Account").focus(),80);
 }
-function closeF1(){
-  const o=$("#f1Overlay");
-  o.classList.remove("open");
-  o.setAttribute("aria-hidden","true");
-}
-function cancelF1(){
-  state.pendingAnalysisAfterF1=false;
-  closeF1();
-  paintRunMode();
-}
+function closeF1(){const o=$("#f1Overlay");o.classList.remove("open");o.setAttribute("aria-hidden","true")}
+function cancelF1(){state.pendingAnalysisAfterF1=false;closeF1();paintRunMode()}
 
-/* ---------- analysis validation / flow ---------- */
+/* ---------- analysis validation ---------- */
 function validateAnalysis(){
   clearErr($("#panel-analysis"));
   const issues=[];
   if(state.analysisSource==="location"){
     const sel=$("#analysisLocation");
     if(!sel.value){issues.push("請選擇分析地點");err(sel,"請選擇分析地點")}
-    else{
-      INFILE_FIELDS.forEach(k=>{
-        const el=$("#"+EDITOR_IDS[k]);
-        if(el&&!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||k}`);err(el,"此欄位為必填")}
-      });
-    }
   }else{
     reqFile($("#analysisVtuFile"),"VTU 檔案",issues);
     reqFile($("#analysisMeshFile"),"MESH 檔案",issues);
+  }
+  const editorActive=$("#infileEditor").classList.contains("open");
+  if(!issues.length&&editorActive){
+    INFILE_FIELDS.forEach(k=>{
+      const el=$("#"+EDITOR_IDS[k]);
+      if(el&&!String(el.value||"").trim()){issues.push(`請設定${el.dataset.label||k}`);err(el,"此欄位為必填")}
+    });
   }
   if(issues.length)focusErr($("#panel-analysis"));
   return issues;
@@ -874,7 +891,7 @@ function beginAnalysis(){
   openModal();
 }
 
-/* ---------- email modal ---------- */
+/* ---------- modals ---------- */
 function validEmail(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)}
 function openWorkflowChooser(){const o=$("#workflowOverlay");o.classList.add("open");o.setAttribute("aria-hidden","false")}
 function closeWorkflowChooser(){const o=$("#workflowOverlay");o.classList.remove("open");o.setAttribute("aria-hidden","true");state.workflowInitialized=true}
@@ -910,8 +927,8 @@ document.addEventListener("click",e=>{
   const source=e.target.closest("[data-analysis-source]");
   if(source){
     state.analysisSource=source.dataset.analysisSource;
-    renderAnalysisSource();
     clearErr($("#panel-analysis"));
+    renderAnalysisSource();
     toast(state.analysisSource==="location"?"模擬來源：地點選擇":"模擬來源：自行上傳（需 VTU + MESH）");
     return;
   }
@@ -955,6 +972,7 @@ document.addEventListener("click",e=>{
       else if(i.id==="inconFile")em.textContent="未上傳將使用系統預設 INCON";
       else em.textContent="請選擇檔案";
     }
+    if(i.id==="analysisVtuFile"||i.id==="analysisMeshFile")renderAnalysisSource();
     toast("已清除上傳檔案");
     return;
   }
@@ -1011,14 +1029,14 @@ document.addEventListener("change",e=>{
         field(e.target)?.classList.remove("field-error");
       }else d.classList.remove("uploaded");
     }
+    if(e.target.id==="analysisVtuFile"||e.target.id==="analysisMeshFile")renderAnalysisSource();
   }
   if(e.target.id==="generateInfile")$("#infileSettings").classList.toggle("open",e.target.checked);
 });
 
 document.addEventListener("input",e=>{
   if(e.target.matches("[data-editor]")){
-    const loc=state.selectedLocation;
-    if(loc)setDirty(!sameInfile(readEditor(),INFILE_SAVED[loc]||{}));
+    setDirty(!sameInfile(readEditor(),currentSaved()));
   }
 });
 
@@ -1029,16 +1047,11 @@ $("#analysisLocation").addEventListener("change",e=>{
     if(!ok){e.target.value=state.selectedLocation;return}
   }
   state.selectedLocation=next;
-  if(!next){
-    setDirty(false);
-    toggleInfileEditor(false);
-    return;
-  }
+  if(!next){renderAnalysisSource();return}
   loadLocation(next);
   toast(`已載入地點 ${next} 的 INFILE 設定。`);
 });
 
-/* F1 modal */
 $("#f1Next").onclick=()=>{
   clearErr($("#f1Overlay"));
   const acc=$("#f1Account").value.trim();
@@ -1061,15 +1074,11 @@ $("#f1Submit").onclick=()=>{
   paintRunMode();
   closeF1();
   toast("F1 身分驗證完成，可使用 F1 運算。");
-  if(state.pendingAnalysisAfterF1){
-    state.pendingAnalysisAfterF1=false;
-    setTimeout(openModal,180);
-  }
+  if(state.pendingAnalysisAfterF1){state.pendingAnalysisAfterF1=false;setTimeout(openModal,180)}
 };
 $("#f1Cancel").onclick=cancelF1;
 $("#f1Close").onclick=cancelF1;
 
-/* bottom CTA */
 $("#primaryAction").onclick=()=>{
   if(state.step==="grid"){
     if(validateGrid(true).length){toast("尚無法建立網格，請先完成必要條件。");return}
@@ -1095,11 +1104,11 @@ $("#resetBtn").onclick=()=>{
       }
     });
     clearErr($("#panel-analysis"));
+    renderAnalysisSource();
     toast("已重置模擬分析上傳檔案。");
   }
 };
 
-/* email modal */
 $("#sendVerifyBtn").onclick=()=>{
   if(!validEmail($("#analysisEmail").value.trim())){err($("#analysisEmail"),"請輸入有效的 Email");return}
   state.verifySent=true;
@@ -1128,7 +1137,6 @@ document.addEventListener("keydown",e=>{
   if($("#workflowOverlay").classList.contains("open"))closeWorkflowChooser();
 });
 
-/* boot */
 init();
 setStep("grid");
 hydrateLocations();
